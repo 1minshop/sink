@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
-import { ArrowRight, CreditCard, Database } from 'lucide-react';
-import { Terminal } from './terminal';
+import { Button } from "@/components/ui/button";
+import { ArrowRight, CreditCard, Database, } from "lucide-react";
+import { Terminal } from "./terminal";
 
 export default function HomePage() {
   return (
@@ -10,25 +10,32 @@ export default function HomePage() {
           <div className="lg:grid lg:grid-cols-12 lg:gap-8">
             <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
               <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl md:text-6xl">
-                Build Your SaaS
-                <span className="block text-orange-500">Faster Than Ever</span>
+                Launch Your E-Commerce Shop
+                <span className="block text-orange-500">In Just 1 Minute</span>
               </h1>
               <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                Launch your SaaS product in record time with our powerful,
-                ready-to-use template. Packed with modern technologies and
-                essential integrations.
+                Set up your business’s online store in under a minute. Choose
+                between our free, self-hosted solution or a fully managed cloud
+                service. No coding required—just instant results.
               </p>
-              <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
-                <a
-                  href="https://vercel.com/templates/next.js/next-js-saas-starter"
-                  target="_blank"
-                >
+              <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0 flex flex-col gap-4">
+                <a href="https://github.com/1minshop/sink.git" target="_blank">
                   <Button
                     size="lg"
                     variant="outline"
                     className="text-lg rounded-full"
                   >
-                    Deploy your own
+                    Free Self-Hosted (GitHub)
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </a>
+                <a href="http://1min.shop/sign-up" target="_blank">
+                  <Button
+                    size="lg"
+                    variant="default"
+                    className="text-lg rounded-full bg-orange-500 text-white"
+                  >
+                    Cloud Hosted (1-Minute Setup)
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </a>
@@ -55,11 +62,11 @@ export default function HomePage() {
               </div>
               <div className="mt-5">
                 <h2 className="text-lg font-medium text-gray-900">
-                  Next.js and React
+                  Modern Tech Stack
                 </h2>
                 <p className="mt-2 text-base text-gray-500">
-                  Leverage the power of modern web technologies for optimal
-                  performance and developer experience.
+                  Built with Next.js and React for blazing-fast performance and
+                  a seamless user experience.
                 </p>
               </div>
             </div>
@@ -70,11 +77,11 @@ export default function HomePage() {
               </div>
               <div className="mt-5">
                 <h2 className="text-lg font-medium text-gray-900">
-                  Postgres and Drizzle ORM
+                  Reliable Data & Scalability
                 </h2>
                 <p className="mt-2 text-base text-gray-500">
-                  Robust database solution with an intuitive ORM for efficient
-                  data management and scalability.
+                  Powered by Postgres and Drizzle ORM for robust data management
+                  and effortless scaling as your shop grows.
                 </p>
               </div>
             </div>
@@ -85,11 +92,11 @@ export default function HomePage() {
               </div>
               <div className="mt-5">
                 <h2 className="text-lg font-medium text-gray-900">
-                  Stripe Integration
+                  Instant Payments
                 </h2>
                 <p className="mt-2 text-base text-gray-500">
-                  Seamless payment processing and subscription management with
-                  industry-leading Stripe integration.
+                  Integrated with Stripe for secure, seamless payment processing
+                  and subscription management.
                 </p>
               </div>
             </div>
@@ -102,22 +109,22 @@ export default function HomePage() {
           <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-                Ready to launch your SaaS?
+                Get Your Shop Online—Fast
               </h2>
               <p className="mt-3 max-w-3xl text-lg text-gray-500">
-                Our template provides everything you need to get your SaaS up
-                and running quickly. Don't waste time on boilerplate - focus on
-                what makes your product unique.
+                Whether you want full control with our open-source, self-hosted
+                option or prefer a hassle-free cloud experience, you can launch
+                your e-commerce business in just one minute.
               </p>
             </div>
             <div className="mt-8 lg:mt-0 flex justify-center lg:justify-end">
-              <a href="https://github.com/nextjs/saas-starter" target="_blank">
+              <a href="https://github.com/1minshop/sink.git" target="_blank">
                 <Button
                   size="lg"
                   variant="outline"
                   className="text-lg rounded-full"
                 >
-                  View the code
+                  Explore on GitHub
                   <ArrowRight className="ml-3 h-6 w-6" />
                 </Button>
               </a>
@@ -125,6 +132,16 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <footer className="py-8 bg-white border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center items-center">
+            <p className="text-sm text-gray-500 font-bold">
+              Made in Bhutan 🇧🇹 with ❤️
+            </p>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
