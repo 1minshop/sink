@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { Loader2, PlusCircle, Edit, Trash2, Package } from "lucide-react";
 import { useState, useActionState } from "react";
 import { Product } from "@/lib/db/schema";
@@ -83,6 +84,9 @@ function ProductTable({
             <thead>
               <tr className="border-b">
                 <th className="text-left py-3 px-4 font-medium text-gray-900">
+                  Image
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-900">
                   Name
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-900">
@@ -105,6 +109,19 @@ function ProductTable({
             <tbody>
               {products.map((product) => (
                 <tr key={product.id} className="border-b hover:bg-gray-50">
+                  <td className="py-3 px-4">
+                    {product.imageUrl ? (
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        className="w-12 h-12 object-cover rounded-md border"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 bg-gray-100 rounded-md border flex items-center justify-center">
+                        <Package className="w-6 h-6 text-gray-400" />
+                      </div>
+                    )}
+                  </td>
                   <td className="py-3 px-4">
                     <div>
                       <div className="font-medium text-gray-900">
@@ -167,6 +184,7 @@ function ProductTable({
 }
 
 function CreateProductForm({ onCancel }: { onCancel: () => void }) {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [createState, createAction, isCreatePending] = useActionState<
     ActionState,
     FormData
@@ -190,6 +208,16 @@ function CreateProductForm({ onCancel }: { onCancel: () => void }) {
       </CardHeader>
       <CardContent className="pt-0">
         <form action={createAction} className="space-y-6">
+          {/* Image Upload Section */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Product Image</Label>
+            <ImageUpload
+              onImageChange={setImageUrl}
+              disabled={isCreatePending}
+            />
+            <input type="hidden" name="imageUrl" value={imageUrl || ""} />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium">
@@ -321,6 +349,9 @@ function EditProductForm({
   product: Product;
   onCancel: () => void;
 }) {
+  const [imageUrl, setImageUrl] = useState<string | null>(
+    product.imageUrl || null
+  );
   const [editState, editAction, isEditPending] = useActionState<
     ActionState,
     FormData
@@ -344,6 +375,17 @@ function EditProductForm({
       </CardHeader>
       <CardContent className="pt-0">
         <form action={editAction} className="space-y-6">
+          {/* Image Upload Section */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Product Image</Label>
+            <ImageUpload
+              currentImageUrl={product.imageUrl || undefined}
+              onImageChange={setImageUrl}
+              disabled={isEditPending}
+            />
+            <input type="hidden" name="imageUrl" value={imageUrl || ""} />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium">

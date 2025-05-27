@@ -82,6 +82,7 @@ export const products = pgTable("products", {
   sku: varchar("sku", { length: 100 }),
   inventory: integer("inventory").default(0),
   active: boolean("active").notNull().default(true),
+  imageUrl: text("image_url"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

@@ -7,12 +7,14 @@ This is a starter template for building a E-Commerce SaaS application using **Ne
 - Marketing landing page (`/`) with animated Terminal element
 - Pricing page (`/pricing`) which connects to Stripe Checkout
 - Dashboard pages with CRUD operations on users/teams
+- **Product Management** with image upload capabilities
 - Basic RBAC with Owner and Member roles
 - Subscription management with Stripe Customer Portal
 - Email/password authentication with JWTs stored to cookies
 - Global middleware to protect logged-in routes
 - Local middleware to protect Server Actions or validate Zod schemas
 - Activity logging system for any user events
+- **Image Upload** with Supabase Storage integration
 
 ## Tech Stack
 
@@ -20,6 +22,7 @@ This is a starter template for building a E-Commerce SaaS application using **Ne
 - **Database**: [Postgres](https://www.postgresql.org/)
 - **ORM**: [Drizzle](https://orm.drizzle.team/)
 - **Payments**: [Stripe](https://stripe.com/)
+- **Storage**: [Supabase Storage](https://supabase.com/storage)
 - **UI Library**: [shadcn/ui](https://ui.shadcn.com/)
 
 ## Getting Started

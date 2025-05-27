@@ -15,6 +15,13 @@
       "when": 1748368799102,
       "tag": "0001_chilly_doorman",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1748370396384,
+      "tag": "0002_bitter_moon_knight",
+      "breakpoints": true
     }
   ]
 }

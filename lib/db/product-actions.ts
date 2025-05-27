@@ -29,6 +29,7 @@ export async function createProduct(formData: FormData) {
   const currency = (formData.get("currency") as string) || "USD";
   const sku = formData.get("sku") as string;
   const inventory = parseInt(formData.get("inventory") as string) || 0;
+  const imageUrl = formData.get("imageUrl") as string;
 
   if (!name || !price) {
     throw new Error("Name and price are required");
@@ -43,6 +44,7 @@ export async function createProduct(formData: FormData) {
     sku: sku || null,
     inventory,
     active: true,
+    imageUrl: imageUrl || null,
   };
 
   await db.insert(products).values(newProduct);
@@ -63,6 +65,7 @@ export async function updateProduct(productId: number, formData: FormData) {
   const sku = formData.get("sku") as string;
   const inventory = parseInt(formData.get("inventory") as string) || 0;
   const active = formData.get("active") === "true";
+  const imageUrl = formData.get("imageUrl") as string;
 
   await db
     .update(products)
@@ -74,6 +77,7 @@ export async function updateProduct(productId: number, formData: FormData) {
       sku: sku || null,
       inventory,
       active,
+      imageUrl: imageUrl || null,
       updatedAt: new Date(),
     })
     .where(and(eq(products.id, productId), eq(products.teamId, team.id)));
