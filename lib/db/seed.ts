@@ -13,11 +13,11 @@ async function createStripeProducts() {
 
   await stripe.prices.create({
     product: baseProduct.id,
-    unit_amount: 800, // $8 in cents
+    unit_amount: 100, // $8 in cents
     currency: 'usd',
     recurring: {
       interval: 'month',
-      trial_period_days: 7,
+      trial_period_days: 12,
     },
   });
 
@@ -28,7 +28,7 @@ async function createStripeProducts() {
 
   await stripe.prices.create({
     product: plusProduct.id,
-    unit_amount: 1200, // $12 in cents
+    unit_amount: 1000, // $12 in cents
     currency: 'usd',
     recurring: {
       interval: 'month',
@@ -40,7 +40,7 @@ async function createStripeProducts() {
 }
 
 async function seed() {
-  const email = 'test@test.com';
+  const email = 'test2@test.com';
   const password = 'admin123';
   const passwordHash = await hashPassword(password);
 

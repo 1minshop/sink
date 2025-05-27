@@ -1,287 +1,544 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Loader2, PlusCircle, Edit, Trash2, Package } from "lucide-react";
+import { useState, useActionState } from "react";
+import { Product } from "@/lib/db/schema";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardFooter
-} from '@/components/ui/card';
-import { customerPortalAction } from '@/lib/payments/actions';
-import { useActionState } from 'react';
-import { TeamDataWithMembers, User } from '@/lib/db/schema';
-import { removeTeamMember, inviteTeamMember } from '@/app/(login)/actions';
-import useSWR from 'swr';
-import { Suspense } from 'react';
-import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Loader2, PlusCircle } from 'lucide-react';
+  createProduct,
+  deleteProduct,
+  updateProduct,
+} from "@/lib/db/product-actions";
+import useSWR from "swr";
 
 type ActionState = {
   error?: string;
   success?: string;
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) =>
+  fetch(url)
+    .then((res) => res.json())
+    .then((data) => {
+      // Handle case where API returns an error object
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      // Ensure we always return an array
+      return Array.isArray(data) ? data : [];
+    });
 
-function SubscriptionSkeleton() {
-  return (
-    <Card className="mb-8 h-[140px]">
-      <CardHeader>
-        <CardTitle>Team Subscription</CardTitle>
-      </CardHeader>
-    </Card>
-  );
-}
-
-function ManageSubscription() {
-  const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
-
-  return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle>Team Subscription</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-            <div className="mb-4 sm:mb-0">
-              <p className="font-medium">
-                Current Plan: {teamData?.planName || 'Free'}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {teamData?.subscriptionStatus === 'active'
-                  ? 'Billed monthly'
-                  : teamData?.subscriptionStatus === 'trialing'
-                  ? 'Trial period'
-                  : 'No active subscription'}
-              </p>
-            </div>
-            <form action={customerPortalAction}>
-              <Button type="submit" variant="outline">
-                Manage Subscription
-              </Button>
-            </form>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function TeamMembersSkeleton() {
-  return (
-    <Card className="mb-8 h-[140px]">
-      <CardHeader>
-        <CardTitle>Team Members</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="animate-pulse space-y-4 mt-1">
-          <div className="flex items-center space-x-4">
-            <div className="size-8 rounded-full bg-gray-200"></div>
-            <div className="space-y-2">
-              <div className="h-4 w-32 bg-gray-200 rounded"></div>
-              <div className="h-3 w-14 bg-gray-200 rounded"></div>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function TeamMembers() {
-  const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
-  const [removeState, removeAction, isRemovePending] = useActionState<
-    ActionState,
-    FormData
-  >(removeTeamMember, {});
-
-  const getUserDisplayName = (user: Pick<User, 'id' | 'name' | 'email'>) => {
-    return user.name || user.email || 'Unknown User';
-  };
-
-  if (!teamData?.teamMembers?.length) {
+function ProductTable({
+  products,
+  onCreateClick,
+  onEditProduct,
+  onDeleteProduct,
+}: {
+  products: Product[];
+  onCreateClick: () => void;
+  onEditProduct: (product: Product) => void;
+  onDeleteProduct: (productId: number) => void;
+}) {
+  if (products.length === 0) {
     return (
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Team Members</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">No team members yet.</p>
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center py-12">
+          <Package className="h-12 w-12 text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No products yet
+          </h3>
+          <p className="text-gray-500 text-center mb-6">
+            Get started by creating your first product
+          </p>
+          <Button
+            onClick={onCreateClick}
+            className="bg-orange-500 hover:bg-orange-600 text-white"
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create Product
+          </Button>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle>Team Members</CardTitle>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Products</CardTitle>
+        <Button
+          onClick={onCreateClick}
+          className="bg-orange-500 hover:bg-orange-600 text-white"
+        >
+          <PlusCircle className="mr-2 h-4 w-4" />
+          Create Product
+        </Button>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-4">
-          {teamData.teamMembers.map((member, index) => (
-            <li key={member.id} className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Avatar>
-                  {/* 
-                    This app doesn't save profile images, but here
-                    is how you'd show them:
-
-                    <AvatarImage
-                      src={member.user.image || ''}
-                      alt={getUserDisplayName(member.user)}
-                    />
-                  */}
-                  <AvatarFallback>
-                    {getUserDisplayName(member.user)
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium">
-                    {getUserDisplayName(member.user)}
-                  </p>
-                  <p className="text-sm text-muted-foreground capitalize">
-                    {member.role}
-                  </p>
-                </div>
-              </div>
-              {index > 1 ? (
-                <form action={removeAction}>
-                  <input type="hidden" name="memberId" value={member.id} />
-                  <Button
-                    type="submit"
-                    variant="outline"
-                    size="sm"
-                    disabled={isRemovePending}
-                  >
-                    {isRemovePending ? 'Removing...' : 'Remove'}
-                  </Button>
-                </form>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-        {removeState?.error && (
-          <p className="text-red-500 mt-4">{removeState.error}</p>
-        )}
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left py-3 px-4 font-medium text-gray-900">
+                  Name
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-900">
+                  Price
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-900">
+                  SKU
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-900">
+                  Inventory
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-900">
+                  Status
+                </th>
+                <th className="text-right py-3 px-4 font-medium text-gray-900">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((product) => (
+                <tr key={product.id} className="border-b hover:bg-gray-50">
+                  <td className="py-3 px-4">
+                    <div>
+                      <div className="font-medium text-gray-900">
+                        {product.name}
+                      </div>
+                      {product.description && (
+                        <div className="text-sm text-gray-500 truncate max-w-xs">
+                          {product.description}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 text-gray-900">
+                    ${product.price} {product.currency}
+                  </td>
+                  <td className="py-3 px-4 text-gray-500">
+                    {product.sku || "-"}
+                  </td>
+                  <td className="py-3 px-4 text-gray-900">
+                    {product.inventory}
+                  </td>
+                  <td className="py-3 px-4">
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                        product.active
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {product.active ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onEditProduct(product)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 hover:text-red-800"
+                        onClick={() => onDeleteProduct(product.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </CardContent>
     </Card>
   );
 }
 
-function InviteTeamMemberSkeleton() {
-  return (
-    <Card className="h-[260px]">
-      <CardHeader>
-        <CardTitle>Invite Team Member</CardTitle>
-      </CardHeader>
-    </Card>
-  );
-}
-
-function InviteTeamMember() {
-  const { data: user } = useSWR<User>('/api/user', fetcher);
-  const isOwner = user?.role === 'owner';
-  const [inviteState, inviteAction, isInvitePending] = useActionState<
+function CreateProductForm({ onCancel }: { onCancel: () => void }) {
+  const [createState, createAction, isCreatePending] = useActionState<
     ActionState,
     FormData
-  >(inviteTeamMember, {});
+  >(async (state, formData) => {
+    try {
+      await createProduct(formData);
+      onCancel(); // Close form on success
+      return { success: "Product created successfully" };
+    } catch (error) {
+      return {
+        error:
+          error instanceof Error ? error.message : "Failed to create product",
+      };
+    }
+  }, {});
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Invite Team Member</CardTitle>
+    <Card className="max-w-4xl">
+      <CardHeader className="pb-6">
+        <CardTitle className="text-xl">Create New Product</CardTitle>
       </CardHeader>
-      <CardContent>
-        <form action={inviteAction} className="space-y-4">
-          <div>
-            <Label htmlFor="email" className="mb-2">
-              Email
+      <CardContent className="pt-0">
+        <form action={createAction} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-medium">
+                Product Name *
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                placeholder="Enter product name"
+                className="h-10"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sku" className="text-sm font-medium">
+                SKU
+              </Label>
+              <Input
+                id="sku"
+                name="sku"
+                placeholder="Enter SKU"
+                className="h-10"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-sm font-medium">
+              Description
             </Label>
             <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Enter email"
-              required
-              disabled={!isOwner}
+              id="description"
+              name="description"
+              placeholder="Enter product description"
+              className="h-10"
             />
           </div>
-          <div>
-            <Label>Role</Label>
-            <RadioGroup
-              defaultValue="member"
-              name="role"
-              className="flex space-x-4"
-              disabled={!isOwner}
-            >
-              <div className="flex items-center space-x-2 mt-2">
-                <RadioGroupItem value="member" id="member" />
-                <Label htmlFor="member">Member</Label>
-              </div>
-              <div className="flex items-center space-x-2 mt-2">
-                <RadioGroupItem value="owner" id="owner" />
-                <Label htmlFor="owner">Owner</Label>
-              </div>
-            </RadioGroup>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="price" className="text-sm font-medium">
+                Price *
+              </Label>
+              <Input
+                id="price"
+                name="price"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                className="h-10"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="currency" className="text-sm font-medium">
+                Currency
+              </Label>
+              <Input
+                id="currency"
+                name="currency"
+                defaultValue="USD"
+                placeholder="USD"
+                className="h-10"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="inventory" className="text-sm font-medium">
+                Inventory
+              </Label>
+              <Input
+                id="inventory"
+                name="inventory"
+                type="number"
+                defaultValue="0"
+                placeholder="0"
+                className="h-10"
+              />
+            </div>
           </div>
-          {inviteState?.error && (
-            <p className="text-red-500">{inviteState.error}</p>
+
+          {createState?.error && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-3">
+              <p className="text-red-600 text-sm">{createState.error}</p>
+            </div>
           )}
-          {inviteState?.success && (
-            <p className="text-green-500">{inviteState.success}</p>
+          {createState?.success && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-3">
+              <p className="text-green-600 text-sm">{createState.success}</p>
+            </div>
           )}
-          <Button
-            type="submit"
-            className="bg-orange-500 hover:bg-orange-600 text-white"
-            disabled={isInvitePending || !isOwner}
-          >
-            {isInvitePending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Inviting...
-              </>
-            ) : (
-              <>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Invite Member
-              </>
-            )}
-          </Button>
+
+          <div className="flex justify-end gap-3 pt-4 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              className="px-6"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="bg-orange-500 hover:bg-orange-600 text-white px-6"
+              disabled={isCreatePending}
+            >
+              {isCreatePending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Create Product
+                </>
+              )}
+            </Button>
+          </div>
         </form>
       </CardContent>
-      {!isOwner && (
-        <CardFooter>
-          <p className="text-sm text-muted-foreground">
-            You must be a team owner to invite new members.
-          </p>
-        </CardFooter>
-      )}
     </Card>
   );
 }
 
-export default function SettingsPage() {
+function EditProductForm({
+  product,
+  onCancel,
+}: {
+  product: Product;
+  onCancel: () => void;
+}) {
+  const [editState, editAction, isEditPending] = useActionState<
+    ActionState,
+    FormData
+  >(async (state, formData) => {
+    try {
+      await updateProduct(product.id, formData);
+      onCancel(); // Close form on success
+      return { success: "Product updated successfully" };
+    } catch (error) {
+      return {
+        error:
+          error instanceof Error ? error.message : "Failed to update product",
+      };
+    }
+  }, {});
+
+  return (
+    <Card className="max-w-4xl">
+      <CardHeader className="pb-6">
+        <CardTitle className="text-xl">Edit Product</CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <form action={editAction} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-medium">
+                Product Name *
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                placeholder="Enter product name"
+                defaultValue={product.name}
+                className="h-10"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sku" className="text-sm font-medium">
+                SKU
+              </Label>
+              <Input
+                id="sku"
+                name="sku"
+                placeholder="Enter SKU"
+                defaultValue={product.sku || ""}
+                className="h-10"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-sm font-medium">
+              Description
+            </Label>
+            <Input
+              id="description"
+              name="description"
+              placeholder="Enter product description"
+              defaultValue={product.description || ""}
+              className="h-10"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="price" className="text-sm font-medium">
+                Price *
+              </Label>
+              <Input
+                id="price"
+                name="price"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                defaultValue={product.price}
+                className="h-10"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="currency" className="text-sm font-medium">
+                Currency
+              </Label>
+              <Input
+                id="currency"
+                name="currency"
+                placeholder="USD"
+                defaultValue={product.currency}
+                className="h-10"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="inventory" className="text-sm font-medium">
+                Inventory
+              </Label>
+              <Input
+                id="inventory"
+                name="inventory"
+                type="number"
+                placeholder="0"
+                defaultValue={product.inventory || 0}
+                className="h-10"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="active" className="text-sm font-medium">
+              Status
+            </Label>
+            <select
+              id="active"
+              name="active"
+              defaultValue={product.active ? "true" : "false"}
+              className="w-full h-10 px-3 py-2 text-sm border border-input bg-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+            >
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </div>
+
+          {editState?.error && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-3">
+              <p className="text-red-600 text-sm">{editState.error}</p>
+            </div>
+          )}
+          {editState?.success && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-3">
+              <p className="text-green-600 text-sm">{editState.success}</p>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-3 pt-4 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              className="px-6"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="bg-orange-500 hover:bg-orange-600 text-white px-6"
+              disabled={isEditPending}
+            >
+              {isEditPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                "Update Product"
+              )}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function ProductsPage() {
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const { data: products = [], mutate } = useSWR<Product[]>(
+    "/api/products",
+    fetcher
+  );
+
+  const handleCreateClick = () => {
+    setShowCreateForm(true);
+    setEditingProduct(null);
+  };
+
+  const handleCancelCreate = () => {
+    setShowCreateForm(false);
+    mutate(); // Refresh the products list
+  };
+
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product);
+    setShowCreateForm(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingProduct(null);
+    mutate(); // Refresh the products list
+  };
+
+  const handleDeleteProduct = async (productId: number) => {
+    if (confirm("Are you sure you want to delete this product?")) {
+      try {
+        await deleteProduct(productId);
+        mutate(); // Refresh the products list
+      } catch (error) {
+        console.error("Failed to delete product:", error);
+      }
+    }
+  };
+
   return (
     <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-medium mb-6">Team Settings</h1>
-      <Suspense fallback={<SubscriptionSkeleton />}>
-        <ManageSubscription />
-      </Suspense>
-      <Suspense fallback={<TeamMembersSkeleton />}>
-        <TeamMembers />
-      </Suspense>
-      <Suspense fallback={<InviteTeamMemberSkeleton />}>
-        <InviteTeamMember />
-      </Suspense>
+      <h1 className="text-lg lg:text-2xl font-medium mb-6">Products</h1>
+
+      {showCreateForm ? (
+        <CreateProductForm onCancel={handleCancelCreate} />
+      ) : editingProduct ? (
+        <EditProductForm product={editingProduct} onCancel={handleCancelEdit} />
+      ) : (
+        <ProductTable
+          products={products}
+          onCreateClick={handleCreateClick}
+          onEditProduct={handleEditProduct}
+          onDeleteProduct={handleDeleteProduct}
+        />
+      )}
     </section>
   );
 }

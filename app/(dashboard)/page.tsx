@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CreditCard, Database, } from "lucide-react";
+import { ArrowRight, CreditCard, Database } from "lucide-react";
 import { Terminal } from "./terminal";
 
 export default function HomePage() {
@@ -9,14 +9,19 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-12 lg:gap-8">
             <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
-              <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl md:text-6xl">
-                Launch Your E-Commerce Shop
-                <span className="block text-orange-500">In Just 1 Minute</span>
+              <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl md:text-5xl">
+                From Idea to Online Store
+                <span className="block text-orange-500">in 60 Seconds</span>
               </h1>
               <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                 Set up your business’s online store in under a minute. Choose
                 between our free, self-hosted solution or a fully managed cloud
-                service. No coding required—just instant results.
+                service.{" "}
+                <span className="text-orange-500 underline">
+                  {" "}
+                  No coding required
+                </span>{" "}
+                —just instant results.
               </p>
               <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0 flex flex-col gap-4">
                 <a href="https://github.com/1minshop/sink.git" target="_blank">
@@ -109,7 +114,7 @@ export default function HomePage() {
           <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-                Get Your Shop Online—Fast
+                Get Your Shop Online—Fast ⚡
               </h2>
               <p className="mt-3 max-w-3xl text-lg text-gray-500">
                 Whether you want full control with our open-source, self-hosted
