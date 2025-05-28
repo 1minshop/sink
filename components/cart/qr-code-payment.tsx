@@ -81,6 +81,9 @@ export function QRCodePayment({
 
       if (result.success) {
         toast.success("Payment confirmed successfully!");
+
+        // Call the callback to handle the redirect in the parent component
+        // The checkout form will handle the proper redirect to QR confirmation page
         onPaymentConfirm();
       } else {
         throw new Error(result.error || "Failed to confirm payment");

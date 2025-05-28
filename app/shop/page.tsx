@@ -9,6 +9,7 @@ import { Product } from "@/lib/db/schema";
 import { useCart, useCartActions } from "@/lib/cart/cart-context";
 import { CartSidebar } from "@/components/cart/cart-sidebar";
 import { ConfirmationPage } from "@/components/shop/confirmation-page";
+import { QROrderConfirmation } from "@/components/shop/qr-order-confirmation";
 import Link from "next/link";
 import useSWR from "swr";
 
@@ -277,12 +278,18 @@ function ShopContent() {
   const isSuccess = searchParams.get("success") === "true";
   const sessionId = searchParams.get("session_id");
 
+  // Check if this is a QR code payment confirmation
+  const isQRSuccess = searchParams.get("qr_success") === "true";
+  const qrOrderId = searchParams.get("order_id");
+
   const handleContinueShopping = async () => {
     // Remove success parameters from URL and reload the shop
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
       url.searchParams.delete("success");
       url.searchParams.delete("session_id");
+      url.searchParams.delete("qr_success");
+      url.searchParams.delete("order_id");
 
       // If no subdomain is currently detected, try to get it from session data
       if (!currentSubdomain && sessionId) {
@@ -340,7 +347,37 @@ function ShopContent() {
 
   const currentHost = isClient ? window.location.host : "1minute.shop";
 
-  // If this is a successful checkout, show confirmation page
+  // If this is a successful QR code payment, show QR order confirmation page
+  if (isQRSuccess && qrOrderId) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <ShopHeader
+          shopName={currentSubdomain || "Shop"}
+          subdomain={currentSubdomain}
+          showCart={false}
+        />
+        <main className="flex-1">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <QROrderConfirmation
+              orderId={qrOrderId}
+              onContinueShopping={handleContinueShopping}
+            />
+          </div>
+        </main>
+        <footer className="py-8 bg-white border-t border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-center items-center">
+              <p className="text-sm text-gray-500 font-bold">
+                Made in Bhutan 🇧🇹 with ❤️
+              </p>
+            </div>
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
+  // If this is a successful Stripe checkout, show Stripe confirmation page
   // Even if no subdomain is detected, we can show confirmation using session data
   if (isSuccess && sessionId) {
     return (

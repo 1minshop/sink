@@ -1,7 +1,11 @@
 import Stripe from "stripe";
 import { handleSubscriptionChange, stripe } from "@/lib/payments/stripe";
-import { createOrder } from "@/lib/db/order-actions";
+import { createOrder, getStoreOwnerEmail } from "@/lib/db/order-actions";
 import { NextRequest, NextResponse } from "next/server";
+import {
+  sendOrderConfirmationEmail,
+  sendOrderNotificationToStore,
+} from "@/lib/email/service";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -67,6 +71,8 @@ export async function POST(request: NextRequest) {
             teamId: parseInt(metadata.teamId),
             customerName: metadata.customerName,
             customerEmail: metadata.customerEmail,
+            contactNumber: metadata.contactNumber,
+            deliveryAddress: metadata.deliveryAddress,
             items: items,
             totalAmount: metadata.totalAmount,
             currency: metadata.currency,
@@ -91,6 +97,66 @@ export async function POST(request: NextRequest) {
             "Status:",
             orderStatus
           );
+
+          // Send email notifications if order is paid
+          if (orderStatus === "paid") {
+            try {
+              // Get team name for email
+              const { db } = await import("@/lib/db/drizzle");
+              const { teams } = await import("@/lib/db/schema");
+              const { eq } = await import("drizzle-orm");
+
+              const team = await db.query.teams.findFirst({
+                where: eq(teams.id, orderData.teamId),
+              });
+              const teamName = team?.name || "1 Minute Shop";
+
+              // Prepare email data
+              const emailData = {
+                orderId: order.id,
+                customerName: orderData.customerName,
+                customerEmail: orderData.customerEmail,
+                contactNumber: orderData.contactNumber,
+                deliveryAddress: orderData.deliveryAddress,
+                totalAmount: orderData.totalAmount,
+                currency: orderData.currency,
+                paymentMethod: "stripe",
+                items: orderData.items.map((item: any) => ({
+                  name: item.name,
+                  quantity: item.quantity,
+                  price: item.price,
+                  currency: item.currency,
+                })),
+                teamName: teamName,
+                orderDate: new Date().toISOString(),
+              };
+
+              // Send confirmation email to customer
+              await sendOrderConfirmationEmail(emailData);
+              console.log(
+                "Order confirmation email sent to customer:",
+                orderData.customerEmail
+              );
+
+              // Get store owner email and send notification
+              const storeOwnerEmail = await getStoreOwnerEmail(
+                orderData.teamId
+              );
+              if (storeOwnerEmail) {
+                await sendOrderNotificationToStore(emailData, storeOwnerEmail);
+                console.log(
+                  "Order notification email sent to store owner:",
+                  storeOwnerEmail
+                );
+              }
+            } catch (emailError) {
+              console.error(
+                "Error sending email notifications for Stripe order:",
+                emailError
+              );
+              // Don't throw error - order creation was successful, email failure shouldn't break the webhook
+            }
+          }
         } catch (error) {
           console.error("Error creating order from Stripe webhook:", error);
           console.error("Session data:", JSON.stringify(session, null, 2));

@@ -17,6 +17,8 @@ const stripeCheckoutSchema = z.object({
     .min(1, "At least one item is required"),
   customerName: z.string().min(1, "Customer name is required"),
   customerEmail: z.string().email("Valid email is required"),
+  contactNumber: z.string().min(1, "Contact number is required"),
+  deliveryAddress: z.string().min(1, "Delivery address is required"),
   totalAmount: z.string(),
   currency: z.string(),
   teamId: z.number(),
@@ -97,6 +99,8 @@ export async function POST(request: NextRequest) {
         teamId: teamId.toString(),
         customerName: validatedData.customerName,
         customerEmail: validatedData.customerEmail,
+        contactNumber: validatedData.contactNumber,
+        deliveryAddress: validatedData.deliveryAddress,
         items: JSON.stringify(
           validatedData.items.map((item) => ({
             productId: item.productId,

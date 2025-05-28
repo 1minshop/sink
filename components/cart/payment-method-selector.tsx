@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { CreditCard, QrCode } from "lucide-react";
+import { CreditCard, QrCode, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface PaymentMethodSelectorProps {
   selectedMethod: "stripe" | "qr_code";
@@ -38,25 +36,37 @@ export function PaymentMethodSelector({
         <CardTitle>Payment Method</CardTitle>
       </CardHeader>
       <CardContent>
-        <RadioGroup
-          value={selectedMethod}
-          onValueChange={(value) =>
-            onMethodChange(value as "stripe" | "qr_code")
-          }
-          className="space-y-4"
-        >
+        <div className="space-y-3">
           {enableStripe && (
-            <div className="flex items-center space-x-3 rounded-lg border p-4 cursor-pointer hover:bg-accent/50">
-              <RadioGroupItem value="stripe" id="stripe" />
-              <div className="flex items-center space-x-2 flex-1">
-                <CreditCard className="h-5 w-5" />
-                <div>
-                  <Label
-                    htmlFor="stripe"
-                    className="font-medium cursor-pointer"
-                  >
-                    Credit Card (Stripe)
-                  </Label>
+            <div
+              onClick={() => onMethodChange("stripe")}
+              className={cn(
+                "relative rounded-lg border-2 p-4 cursor-pointer transition-all duration-200 hover:shadow-md",
+                selectedMethod === "stripe"
+                  ? "border-orange-500 bg-orange-500/5 shadow-sm"
+                  : "border-border hover:border-orange-500/50"
+              )}
+            >
+              {selectedMethod === "stripe" && (
+                <div className="absolute top-3 right-3">
+                  <div className="rounded-full bg-orange-500 p-1">
+                    <Check className="h-3 w-3 text-white" />
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center space-x-3">
+                <div
+                  className={cn(
+                    "rounded-lg p-2 transition-colors",
+                    selectedMethod === "stripe"
+                      ? "bg-orange-500/10 text-orange-500"
+                      : "bg-muted text-muted-foreground"
+                  )}
+                >
+                  <CreditCard className="h-5 w-5" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold">Credit Card</h3>
                   <p className="text-sm text-muted-foreground">
                     Pay securely with your credit or debit card
                   </p>
@@ -66,17 +76,35 @@ export function PaymentMethodSelector({
           )}
 
           {enableQrCode && (
-            <div className="flex items-center space-x-3 rounded-lg border p-4 cursor-pointer hover:bg-accent/50">
-              <RadioGroupItem value="qr_code" id="qr_code" />
-              <div className="flex items-center space-x-2 flex-1">
-                <QrCode className="h-5 w-5" />
-                <div>
-                  <Label
-                    htmlFor="qr_code"
-                    className="font-medium cursor-pointer"
-                  >
-                    QR Code Payment
-                  </Label>
+            <div
+              onClick={() => onMethodChange("qr_code")}
+              className={cn(
+                "relative rounded-lg border-2 p-4 cursor-pointer transition-all duration-200 hover:shadow-md",
+                selectedMethod === "qr_code"
+                  ? "border-orange-500 bg-orange-500/5 shadow-sm"
+                  : "border-border hover:border-orange-500/50"
+              )}
+            >
+              {selectedMethod === "qr_code" && (
+                <div className="absolute top-3 right-3">
+                  <div className="rounded-full bg-orange-500 p-1">
+                    <Check className="h-3 w-3 text-white" />
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center space-x-3">
+                <div
+                  className={cn(
+                    "rounded-lg p-2 transition-colors",
+                    selectedMethod === "qr_code"
+                      ? "bg-orange-500/10 text-orange-500"
+                      : "bg-muted text-muted-foreground"
+                  )}
+                >
+                  <QrCode className="h-5 w-5" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold">QR Code Payment</h3>
                   <p className="text-sm text-muted-foreground">
                     Pay using mobile banking or e-wallet
                   </p>
@@ -84,7 +112,7 @@ export function PaymentMethodSelector({
               </div>
             </div>
           )}
-        </RadioGroup>
+        </div>
       </CardContent>
     </Card>
   );

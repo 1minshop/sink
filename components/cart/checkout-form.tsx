@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useCart, useCartActions } from "@/lib/cart/cart-context";
-import { ArrowLeft, CreditCard } from "lucide-react";
+import { ArrowLeft, CreditCard, QrCode } from "lucide-react";
 import { PaymentMethodSelector } from "./payment-method-selector";
 import { QRCodePayment } from "./qr-code-payment";
+import { useRouter } from "next/navigation";
 
 interface CheckoutFormProps {
   onBack: () => void;
@@ -27,6 +28,7 @@ interface TeamPaymentSettings {
 export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
   const { state } = useCart();
   const { clearCart } = useCartActions();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [paymentSettings, setPaymentSettings] =
     useState<TeamPaymentSettings | null>(null);
@@ -40,6 +42,8 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
   const [formData, setFormData] = useState({
     customerName: "",
     customerEmail: "",
+    deliveryAddress: "",
+    contactNumber: "",
   });
 
   // Fetch payment settings on component mount
@@ -76,6 +80,8 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
         teamId,
         customerName: formData.customerName,
         customerEmail: formData.customerEmail,
+        deliveryAddress: formData.deliveryAddress,
+        contactNumber: formData.contactNumber,
         items: state.items.map((item) => ({
           productId: item.product.id,
           quantity: item.quantity,
@@ -121,6 +127,8 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
         teamId,
         customerName: formData.customerName,
         customerEmail: formData.customerEmail,
+        deliveryAddress: formData.deliveryAddress,
+        contactNumber: formData.contactNumber,
         items: state.items.map((item) => ({
           productId: item.product.id,
           quantity: item.quantity,
@@ -169,11 +177,34 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
   };
 
   const handlePaymentConfirm = () => {
-    clearCart();
-    toast.success("Order completed successfully!", {
-      duration: 2000,
-    });
-    onSuccess();
+    // For QR payments, redirect to the QR confirmation page instead of just calling onSuccess
+    if (paymentMethod === "qr_code" && orderId) {
+      clearCart();
+      toast.success("Order completed successfully!", {
+        duration: 2000,
+      });
+
+      // Build the confirmation URL with QR success parameters
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set("qr_success", "true");
+      currentUrl.searchParams.set("order_id", orderId.toString());
+
+      // Clear any existing success parameters to avoid conflicts
+      currentUrl.searchParams.delete("success");
+      currentUrl.searchParams.delete("session_id");
+
+      // Use Next.js router to navigate to the confirmation page
+      setTimeout(() => {
+        router.push(currentUrl.toString());
+      }, 1000);
+    } else {
+      // For other payment methods, use the default behavior
+      clearCart();
+      toast.success("Order completed successfully!", {
+        duration: 2000,
+      });
+      onSuccess();
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -181,7 +212,10 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
   };
 
   const isFormValid =
-    formData.customerName.trim() && formData.customerEmail.trim();
+    formData.customerName.trim() &&
+    formData.customerEmail.trim() &&
+    formData.deliveryAddress.trim() &&
+    formData.contactNumber.trim();
 
   // Show QR code payment screen
   if (
@@ -295,6 +329,46 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
                 className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               />
             </div>
+
+            <div>
+              <Label
+                htmlFor="contactNumber"
+                className="text-sm font-medium text-gray-700"
+              >
+                Contact Number *
+              </Label>
+              <Input
+                id="contactNumber"
+                type="tel"
+                value={formData.contactNumber}
+                onChange={(e) =>
+                  handleInputChange("contactNumber", e.target.value)
+                }
+                placeholder="Enter your contact number"
+                required
+                className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              />
+            </div>
+
+            <div>
+              <Label
+                htmlFor="deliveryAddress"
+                className="text-sm font-medium text-gray-700"
+              >
+                Delivery Address *
+              </Label>
+              <Input
+                id="deliveryAddress"
+                type="text"
+                value={formData.deliveryAddress}
+                onChange={(e) =>
+                  handleInputChange("deliveryAddress", e.target.value)
+                }
+                placeholder="Enter your delivery address"
+                required
+                className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              />
+            </div>
           </div>
 
           {/* Payment Method Selection */}
@@ -361,11 +435,15 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <CreditCard className="h-4 w-4" />
+              {paymentMethod === "stripe" ? (
+                <CreditCard className="h-4 w-4" />
+              ) : (
+                <QrCode className="h-4 w-4" />
+              )}
               <span>
                 {paymentMethod === "stripe"
                   ? "Pay with Card"
-                  : "Continue to Payment"}
+                  : "Pay by QR Code"}
               </span>
             </div>
           )}

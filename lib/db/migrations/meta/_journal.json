@@ -50,6 +50,13 @@
       "when": 1748458156073,
       "tag": "0006_add_proof_of_payment_to_orders",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1748464704532,
+      "tag": "0007_ordinary_zeigeist",
+      "breakpoints": true
     }
   ]
 }

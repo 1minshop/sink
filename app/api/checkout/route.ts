@@ -6,6 +6,8 @@ const checkoutSchema = z.object({
   teamId: z.number(),
   customerName: z.string().min(1, "Customer name is required"),
   customerEmail: z.string().email("Valid email is required"),
+  contactNumber: z.string().min(1, "Contact number is required"),
+  deliveryAddress: z.string().min(1, "Delivery address is required"),
   items: z
     .array(
       z.object({

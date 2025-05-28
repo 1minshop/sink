@@ -102,6 +102,8 @@ export const orders = pgTable("orders", {
     .references(() => teams.id),
   customerName: varchar("customer_name", { length: 255 }).notNull(),
   customerEmail: varchar("customer_email", { length: 255 }).notNull(),
+  contactNumber: varchar("contact_number", { length: 50 }).notNull(),
+  deliveryAddress: text("delivery_address").notNull(),
   status: varchar("status", { length: 20 }).notNull().default("pending"),
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
   currency: varchar("currency", { length: 3 }).notNull().default("USD"),
