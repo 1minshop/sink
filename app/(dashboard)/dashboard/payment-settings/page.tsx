@@ -194,7 +194,7 @@ export default function PaymentSettingsPage() {
                   onChange={(e) =>
                     handleInputChange("qrCodePaymentName", e.target.value)
                   }
-                  placeholder="e.g., Bank Transfer, Mobile Banking, WeChat Pay"
+                  placeholder="e.g., Bank Transfer, Mobile Banking, mBOB"
                   className="mt-2"
                 />
                 <p className="text-sm text-muted-foreground mt-1">

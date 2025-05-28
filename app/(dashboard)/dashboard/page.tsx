@@ -738,7 +738,7 @@ export default function ProductsPage() {
           Products
         </h1>
         <div className="flex gap-2">
-          <Button
+          {/* <Button
             onClick={handleSyncProducts}
             disabled={isSyncing}
             variant="outline"
@@ -748,7 +748,7 @@ export default function ProductsPage() {
               className={`h-4 w-4 ${isSyncing ? "animate-spin" : ""}`}
             />
             {isSyncing ? "Syncing..." : "Sync to Stripe"}
-          </Button>
+          </Button> */}
         </div>
       </div>
 

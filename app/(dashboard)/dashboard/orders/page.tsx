@@ -16,6 +16,7 @@ import {
   ChevronUp,
   Search,
   X,
+  Image,
 } from "lucide-react";
 import useSWR from "swr";
 
@@ -40,6 +41,8 @@ interface Order {
   status: string;
   totalAmount: string;
   currency: string;
+  paymentMethod?: string;
+  proofOfPaymentImageUrl?: string;
   createdAt: string;
   orderItems: OrderItem[];
 }
@@ -186,6 +189,48 @@ function OrderCard({ order }: { order: Order }) {
                 </div>
               ))}
             </div>
+
+            {/* Proof of Payment Section */}
+            {order.paymentMethod === "qr_code" &&
+              order.proofOfPaymentImageUrl && (
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                    <Image className="h-4 w-4 mr-2" />
+                    Proof of Payment
+                  </h4>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden border-2 border-gray-300">
+                        <img
+                          src={order.proofOfPaymentImageUrl}
+                          alt="Proof of payment"
+                          className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                          onClick={() =>
+                            window.open(order.proofOfPaymentImageUrl, "_blank")
+                          }
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm text-gray-600 mb-2">
+                          Customer submitted proof of payment for QR code
+                          transaction
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            window.open(order.proofOfPaymentImageUrl, "_blank")
+                          }
+                          className="text-sm"
+                        >
+                          <Eye className="h-3 w-3 mr-1" />
+                          View Full Size
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
           </div>
         )}
       </CardContent>

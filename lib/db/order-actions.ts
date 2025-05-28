@@ -1,5 +1,6 @@
 import { db } from "@/lib/db/drizzle";
 import { orders, orderItems, NewOrder, NewOrderItem } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 interface CreateOrderData {
   teamId: number;
@@ -17,6 +18,7 @@ interface CreateOrderData {
   paymentMethod?: "stripe" | "qr_code";
   stripePaymentIntentId?: string;
   stripeSessionId?: string;
+  proofOfPaymentImageUrl?: string;
 }
 
 export async function createOrder(data: CreateOrderData) {
@@ -34,6 +36,7 @@ export async function createOrder(data: CreateOrderData) {
         paymentMethod: data.paymentMethod || "qr_code",
         stripePaymentIntentId: data.stripePaymentIntentId,
         stripeSessionId: data.stripeSessionId,
+        proofOfPaymentImageUrl: data.proofOfPaymentImageUrl,
       })
       .returning();
 
@@ -64,4 +67,21 @@ export async function getTeamOrders(teamId: number) {
     },
     orderBy: (orders, { desc }) => [desc(orders.createdAt)],
   });
+}
+
+export async function updateOrderWithProofOfPayment(
+  orderId: number,
+  proofOfPaymentImageUrl: string
+) {
+  const [updatedOrder] = await db
+    .update(orders)
+    .set({
+      proofOfPaymentImageUrl,
+      status: "paid", // Update status to paid when proof is submitted
+      updatedAt: new Date(),
+    })
+    .where(eq(orders.id, orderId))
+    .returning();
+
+  return updatedOrder;
 }

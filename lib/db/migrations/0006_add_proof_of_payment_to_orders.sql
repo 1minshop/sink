@@ -1,0 +1,1 @@
+ALTER TABLE "orders" ADD COLUMN "proof_of_payment_image_url" text;

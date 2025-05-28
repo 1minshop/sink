@@ -110,6 +110,7 @@ export const orders = pgTable("orders", {
     .default("qr_code"), // 'stripe' or 'qr_code'
   stripePaymentIntentId: text("stripe_payment_intent_id"),
   stripeSessionId: text("stripe_session_id"),
+  proofOfPaymentImageUrl: text("proof_of_payment_image_url"), // For QR code payments
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
