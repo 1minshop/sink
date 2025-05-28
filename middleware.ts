@@ -83,6 +83,16 @@ function getSubdomain(hostname: string): string | null {
     return subdomain === "localhost" ? null : subdomain;
   }
 
+  // For 1min.shop domain (e.g., shop1.1min.shop)
+  if (
+    parts.length >= 3 &&
+    parts[parts.length - 2] === "1min" &&
+    parts[parts.length - 1] === "shop"
+  ) {
+    const subdomain = parts[0];
+    return subdomain === "www" ? null : subdomain;
+  }
+
   // For production domains (e.g., shop1.example.com)
   if (parts.length >= 3) {
     return parts[0];

@@ -1,6 +1,7 @@
 # Subdomain Shopfront Development Guide
 
 ## Overview
+
 The subdomain interceptor automatically routes subdomain requests to individual shopfronts, allowing users to create their own branded stores.
 
 ## How It Works
@@ -12,6 +13,7 @@ The subdomain interceptor automatically routes subdomain requests to individual 
 ## Local Development Setup
 
 ### Method 1: Using hosts file (Recommended)
+
 Add entries to your `/etc/hosts` file:
 
 ```bash
@@ -25,24 +27,52 @@ sudo nano /etc/hosts
 ```
 
 Then visit:
+
 - `http://shop1.localhost:3000` → Shows shop1's products
 - `http://shop2.localhost:3000` → Shows shop2's products
 - `http://localhost:3000` → Main application
 
 ### Method 2: Testing with external domains
+
 If you have a domain, you can set up DNS A records:
+
 - `*.yourdomain.com` → Your server IP
 - Test with `shop1.yourdomain.com`
 
 ## URL Structure
 
-- **Main App**: `localhost:3000` or `yourdomain.com`
-- **Shopfront**: `[subdomain].localhost:3000` or `[subdomain].yourdomain.com`
-- **Dashboard**: `localhost:3000/dashboard` (protected route)
+- **Main App**: `localhost:3000`, `1min.shop`, or `yourdomain.com`
+- **Shopfront**: `[subdomain].localhost:3000`, `[subdomain].1min.shop`, or `[subdomain].yourdomain.com`
+- **Dashboard**: `localhost:3000/dashboard`, `1min.shop/dashboard` (protected route)
+
+## Examples
+
+### Development:
+
+- Main app: `http://localhost:3000`
+- Shopfronts:
+  - `http://shop1.localhost:3000`
+  - `http://mystore.localhost:3000`
+
+### Production (1min.shop):
+
+- Main app: `https://1min.shop`
+- Shopfronts:
+  - `https://shop1.1min.shop`
+  - `https://mystore.1min.shop`
+  - `https://demo.1min.shop`
+
+### Production (Custom Domain):
+
+- Main app: `https://yourdomain.com`
+- Shopfronts:
+  - `https://shop1.yourdomain.com`
+  - `https://mystore.yourdomain.com`
 
 ## Features
 
 ### Shopfront (`/shop/[slug]/page.tsx`):
+
 - ✅ Product grid display
 - ✅ Mobile responsive design
 - ✅ Product images with fallbacks
@@ -52,6 +82,7 @@ If you have a domain, you can set up DNS A records:
 - ✅ Shopping cart (future)
 
 ### Middleware (`middleware.ts`):
+
 - ✅ Subdomain detection
 - ✅ Route rewriting
 - ✅ Development and production support
@@ -60,6 +91,7 @@ If you have a domain, you can set up DNS A records:
 ## Testing Steps
 
 1. **Start the development server**:
+
    ```bash
    npm run dev
    ```
@@ -67,10 +99,12 @@ If you have a domain, you can set up DNS A records:
 2. **Add hosts entries** (see Method 1 above)
 
 3. **Create test products** in the dashboard:
+
    - Visit `http://localhost:3000/dashboard`
    - Create some products with images
 
 4. **Visit shopfront**:
+
    - Go to `http://shop1.localhost:3000`
    - Should see the shopfront with products
 
@@ -95,16 +129,19 @@ If you have a domain, you can set up DNS A records:
 ## Troubleshooting
 
 ### "Store Not Found" Error
+
 - Check if hosts file entries are correct
 - Ensure development server is running
 - Try clearing browser cache
 
 ### Middleware Not Working
+
 - Check browser network tab for redirects
 - Verify subdomain format (no underscores)
 - Test with different subdomains
 
 ### Products Not Loading
+
 - Check `/api/products` endpoint
 - Verify database connection
 - Check browser console for errors
