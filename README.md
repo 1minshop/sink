@@ -8,6 +8,7 @@ This is a starter template for building a E-Commerce SaaS application using **Ne
 - Pricing page (`/pricing`) which connects to Stripe Checkout
 - Dashboard pages with CRUD operations on users/teams
 - **Product Management** with image upload capabilities
+- **Subdomain Shopfront** - Automatic routing to individual stores via subdomains
 - Basic RBAC with Owner and Member roles
 - Subscription management with Stripe Customer Portal
 - Email/password authentication with JWTs stored to cookies
@@ -66,6 +67,28 @@ pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to see the app in action.
+
+### Testing Subdomain Shopfronts
+
+To test the subdomain shopfront functionality locally:
+
+1. **Set up local subdomains** (run once):
+
+   ```bash
+   ./scripts/setup-subdomains.sh
+   ```
+
+2. **Create some products** in the dashboard:
+
+   - Visit `http://localhost:3000/dashboard`
+   - Add products with images
+
+3. **Test shopfronts**:
+   - `http://shop1.localhost:3000` - Individual store
+   - `http://shop2.localhost:3000` - Another store
+   - `http://mystore.localhost:3000` - Custom store
+
+See `SUBDOMAIN_GUIDE.md` for detailed setup and troubleshooting.
 
 You can listen for Stripe webhooks locally through their CLI to handle subscription change events:
 

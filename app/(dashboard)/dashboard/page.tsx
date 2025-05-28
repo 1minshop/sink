@@ -5,7 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { Loader2, PlusCircle, Edit, Trash2, Package } from "lucide-react";
+import { Loader2, PlusCircle, Edit, Trash2, Package, MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useState, useActionState } from "react";
 import { Product } from "@/lib/db/schema";
 import {
@@ -79,7 +85,8 @@ function ProductTable({
         </Button>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b">
@@ -177,6 +184,106 @@ function ProductTable({
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="md:hidden space-y-4">
+          {products.map((product) => (
+            <Card key={product.id} className="border border-gray-200">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  {/* Product Image */}
+                  <div className="flex-shrink-0">
+                    {product.imageUrl ? (
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        className="w-16 h-16 object-cover rounded-md border"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-gray-100 rounded-md border flex items-center justify-center">
+                        <Package className="w-8 h-8 text-gray-400" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Product Details */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-gray-900 truncate">
+                          {product.name}
+                        </h3>
+                        {product.description && (
+                          <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                            {product.description}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Actions Dropdown */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => onEditProduct(product)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => onDeleteProduct(product.id)}
+                            className="text-red-600 focus:text-red-600"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+
+                    {/* Product Info Grid */}
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-3 text-sm">
+                      <div>
+                        <span className="text-gray-500">Price:</span>
+                        <span className="ml-1 font-medium text-gray-900">
+                          ${product.price} {product.currency}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Inventory:</span>
+                        <span className="ml-1 font-medium text-gray-900">
+                          {product.inventory}
+                        </span>
+                      </div>
+                      {product.sku && (
+                        <div>
+                          <span className="text-gray-500">SKU:</span>
+                          <span className="ml-1 font-medium text-gray-900">
+                            {product.sku}
+                          </span>
+                        </div>
+                      )}
+                      <div>
+                        <span className="text-gray-500">Status:</span>
+                        <span
+                          className={`ml-1 inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${
+                            product.active
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {product.active ? "Active" : "Inactive"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </CardContent>
     </Card>
