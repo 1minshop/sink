@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { CreditCard, QrCode } from "lucide-react";
 
@@ -19,73 +21,71 @@ export function PaymentMethodSelector({
 }: PaymentMethodSelectorProps) {
   if (!enableStripe && !enableQrCode) {
     return (
-      <div className="pt-6">
-        <p className="text-center text-muted-foreground">
-          No payment methods are currently available. Please contact the store
-          owner.
-        </p>
-      </div>
+      <Card>
+        <CardContent className="pt-6">
+          <p className="text-center text-muted-foreground">
+            No payment methods are currently available. Please contact the store
+            owner.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-        Payment Method
-      </h3>
-      <div className="space-y-3">
-        {enableStripe && (
-          <div
-            onClick={() => onMethodChange("stripe")}
-            className={`flex items-start space-x-4 rounded-xl border-2 p-5 cursor-pointer transition-all duration-200 hover:border-orange-200 hover:bg-orange-50/50 ${
-              selectedMethod === "stripe"
-                ? "border-orange-500 bg-orange-50"
-                : "border-gray-200"
-            }`}
-          >
-            <div className="flex items-start space-x-3 flex-1">
-              <div className="p-2 rounded-lg bg-blue-100">
-                <CreditCard className="h-5 w-5 text-blue-600" />
-              </div>
-              <div className="space-y-1">
-                <div className="font-semibold text-gray-900">
-                  Credit Card (Stripe)
+    <Card>
+      <CardHeader>
+        <CardTitle>Payment Method</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <RadioGroup
+          value={selectedMethod}
+          onValueChange={(value) =>
+            onMethodChange(value as "stripe" | "qr_code")
+          }
+          className="space-y-4"
+        >
+          {enableStripe && (
+            <div className="flex items-center space-x-3 rounded-lg border p-4 cursor-pointer hover:bg-accent/50">
+              <RadioGroupItem value="stripe" id="stripe" />
+              <div className="flex items-center space-x-2 flex-1">
+                <CreditCard className="h-5 w-5" />
+                <div>
+                  <Label
+                    htmlFor="stripe"
+                    className="font-medium cursor-pointer"
+                  >
+                    Credit Card (Stripe)
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Pay securely with your credit or debit card
+                  </p>
                 </div>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  Pay securely with your credit or debit card. Supports all
-                  major cards.
-                </p>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {enableQrCode && (
-          <div
-            onClick={() => onMethodChange("qr_code")}
-            className={`flex items-start space-x-4 rounded-xl border-2 p-5 cursor-pointer transition-all duration-200 hover:border-orange-200 hover:bg-orange-50/50 ${
-              selectedMethod === "qr_code"
-                ? "border-orange-500 bg-orange-50"
-                : "border-gray-200"
-            }`}
-          >
-            <div className="flex items-start space-x-3 flex-1">
-              <div className="p-2 rounded-lg bg-green-100">
-                <QrCode className="h-5 w-5 text-green-600" />
-              </div>
-              <div className="space-y-1">
-                <div className="font-semibold text-gray-900">
-                  QR Code Payment
+          {enableQrCode && (
+            <div className="flex items-center space-x-3 rounded-lg border p-4 cursor-pointer hover:bg-accent/50">
+              <RadioGroupItem value="qr_code" id="qr_code" />
+              <div className="flex items-center space-x-2 flex-1">
+                <QrCode className="h-5 w-5" />
+                <div>
+                  <Label
+                    htmlFor="qr_code"
+                    className="font-medium cursor-pointer"
+                  >
+                    QR Code Payment
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Pay using mobile banking or e-wallet
+                  </p>
                 </div>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  Pay using mobile banking, mBoB, or e-wallet apps by scanning
-                  QR code.
-                </p>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-    </div>
+          )}
+        </RadioGroup>
+      </CardContent>
+    </Card>
   );
 }

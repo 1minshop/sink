@@ -76,49 +76,7 @@ function OrderCard({ order }: { order: Order }) {
   return (
     <Card className="mb-4 hover:shadow-md transition-shadow">
       <CardHeader className="pb-4">
-        {/* Mobile Layout */}
-        <div className="flex flex-col space-y-4 sm:hidden">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-orange-100 p-2 rounded-lg">
-                <ShoppingBag className="h-4 w-4 text-orange-600" />
-              </div>
-              <CardTitle className="text-base font-semibold">
-                Order #{order.id}
-              </CardTitle>
-            </div>
-            <Badge
-              className={`px-2 py-1 text-xs ${getStatusColor(order.status)}`}
-            >
-              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-            </Badge>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="text-right">
-              <div className="text-lg font-bold text-gray-900">
-                {order.currency === "INR" ? "₹ " : "$ "}
-                {order.totalAmount}
-              </div>
-              <div className="text-xs text-gray-500">{order.currency}</div>
-            </div>
-            <div className="flex flex-col space-y-1 text-xs text-gray-600">
-              <div className="flex items-center space-x-1">
-                <Calendar className="h-3 w-3" />
-                <span>{formatDate(order.createdAt)}</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <User className="h-3 w-3" />
-                <span className="truncate max-w-[140px]">
-                  {order.customerName}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop Layout */}
-        <div className="hidden sm:flex items-center justify-between">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="bg-orange-100 p-2 rounded-lg">
               <ShoppingBag className="h-5 w-5 text-orange-600" />
@@ -145,7 +103,7 @@ function OrderCard({ order }: { order: Order }) {
             </Badge>
             <div className="text-right">
               <div className="text-lg font-bold text-gray-900">
-                {order.currency === "INR" ? "₹ " : "$ "}
+                {order.currency === "BTN" ? "Nu. " : "$ "}
                 {order.totalAmount}
               </div>
               <div className="text-sm text-gray-500">{order.currency}</div>
@@ -155,44 +113,7 @@ function OrderCard({ order }: { order: Order }) {
       </CardHeader>
 
       <CardContent className="pt-0">
-        {/* Mobile Layout */}
-        <div className="sm:hidden">
-          <div className="flex flex-col space-y-3 text-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-1 text-gray-600">
-                <Mail className="h-3 w-3" />
-                <span className="truncate">{order.customerEmail}</span>
-              </div>
-              <div className="flex items-center space-x-1 text-gray-600">
-                <Package className="h-3 w-3" />
-                <span>
-                  {order.orderItems.length} item
-                  {order.orderItems.length !== 1 ? "s" : ""}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex justify-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="flex items-center space-x-1 text-xs"
-              >
-                <Eye className="h-3 w-3" />
-                <span>View Details</span>
-                {isExpanded ? (
-                  <ChevronUp className="h-3 w-3" />
-                ) : (
-                  <ChevronDown className="h-3 w-3" />
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop Layout */}
-        <div className="hidden sm:flex items-center justify-between">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4 text-sm text-gray-600">
             <div className="flex items-center space-x-1">
               <Mail className="h-4 w-4" />
@@ -230,10 +151,10 @@ function OrderCard({ order }: { order: Order }) {
               {order.orderItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg space-y-2 sm:space-y-0"
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                    <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden">
                       {item.product.imageUrl ? (
                         <img
                           src={item.product.imageUrl}
@@ -242,26 +163,26 @@ function OrderCard({ order }: { order: Order }) {
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                          <Package className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+                          <Package className="w-5 h-5 text-gray-400" />
                         </div>
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-gray-900 text-sm sm:text-base truncate">
+                    <div>
+                      <div className="font-medium text-gray-900">
                         {item.product.name}
                       </div>
-                      <div className="text-xs sm:text-sm text-gray-600">
+                      <div className="text-sm text-gray-600">
                         Quantity: {item.quantity}
                       </div>
                     </div>
                   </div>
-                  <div className="text-left sm:text-right ml-13 sm:ml-0">
-                    <div className="font-semibold text-gray-900 text-sm sm:text-base">
-                      {item.currency === "INR" ? "₹ " : "$ "}
+                  <div className="text-right">
+                    <div className="font-semibold text-gray-900">
+                      {item.currency === "BTN" ? "Nu. " : "$ "}
                       {(parseFloat(item.price) * item.quantity).toFixed(2)}
                     </div>
-                    <div className="text-xs sm:text-sm text-gray-600">
-                      {item.currency === "INR" ? "₹ " : "$ "}
+                    <div className="text-sm text-gray-600">
+                      {item.currency === "BTN" ? "Nu. " : "$ "}
                       {item.price} each
                     </div>
                   </div>
@@ -278,8 +199,8 @@ function OrderCard({ order }: { order: Order }) {
                     Proof of Payment
                   </h4>
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex flex-col sm:flex-row sm:items-start space-y-3 sm:space-y-0 sm:space-x-4">
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 rounded-lg overflow-hidden border-2 border-gray-300 mx-auto sm:mx-0 flex-shrink-0">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden border-2 border-gray-300">
                         <img
                           src={order.proofOfPaymentImageUrl}
                           alt="Proof of payment"
@@ -289,8 +210,8 @@ function OrderCard({ order }: { order: Order }) {
                           }
                         />
                       </div>
-                      <div className="flex-1 text-center sm:text-left">
-                        <div className="text-xs sm:text-sm text-gray-600 mb-3">
+                      <div className="flex-1">
+                        <div className="text-sm text-gray-600 mb-2">
                           Customer submitted proof of payment for QR code
                           transaction
                         </div>
@@ -300,7 +221,7 @@ function OrderCard({ order }: { order: Order }) {
                           onClick={() =>
                             window.open(order.proofOfPaymentImageUrl, "_blank")
                           }
-                          className="text-xs sm:text-sm w-full sm:w-auto"
+                          className="text-sm"
                         >
                           <Eye className="h-3 w-3 mr-1" />
                           View Full Size
@@ -337,7 +258,7 @@ export default function OrdersPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-6xl mx-auto p-4 sm:p-6">
+      <div className="max-w-6xl mx-auto p-6">
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
             <Card key={i} className="animate-pulse">
@@ -357,7 +278,7 @@ export default function OrdersPage() {
 
   if (error) {
     return (
-      <div className="max-w-6xl mx-auto p-4 sm:p-6">
+      <div className="max-w-6xl mx-auto p-6">
         <Card>
           <CardContent className="pt-6">
             <div className="text-center py-8">
@@ -376,19 +297,17 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-4 sm:p-6">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-          Orders
-        </h1>
-        <p className="text-gray-600 text-sm sm:text-base">
+    <div className="max-w-6xl mx-auto p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Orders</h1>
+        <p className="text-gray-600">
           Manage and view all orders from your store
         </p>
       </div>
 
       {/* Search Bar */}
       <div className="mb-6">
-        <div className="relative w-full sm:max-w-md">
+        <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             type="text"
@@ -409,7 +328,7 @@ export default function OrdersPage() {
           )}
         </div>
         {searchEmail && (
-          <p className="text-xs sm:text-sm text-gray-600 mt-2">
+          <p className="text-sm text-gray-600 mt-2">
             {filteredOrders.length} order
             {filteredOrders.length !== 1 ? "s" : ""} found for &ldquo;
             {searchEmail}&rdquo;
@@ -461,7 +380,7 @@ export default function OrdersPage() {
       ) : (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <div className="text-xs sm:text-sm text-gray-600">
+            <div className="text-sm text-gray-600">
               {searchEmail ? (
                 <>
                   Showing {filteredOrders.length} of {orders.length} order
@@ -475,7 +394,7 @@ export default function OrdersPage() {
             </div>
           </div>
 
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-4">
             {filteredOrders.map((order) => (
               <OrderCard key={order.id} order={order} />
             ))}

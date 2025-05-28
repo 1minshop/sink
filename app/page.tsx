@@ -160,7 +160,7 @@ function LandingPage({ currentHost }: { currentHost: string }) {
                 </p>
                 <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0 flex flex-col gap-4">
                   <a
-                    href="https://github.com/C-gyeltshen/1minute.shop.git"
+                    href="https://github.com/1minshop/sink.git"
                     target="_blank"
                   >
                     <Button
@@ -301,7 +301,7 @@ function LandingPage({ currentHost }: { currentHost: string }) {
                 </p>
               </div>
               <div className="mt-8 lg:mt-0 flex justify-center lg:justify-end">
-                <a href="https://github.com/C-gyeltshen/1minute.shop.git" target="_blank">
+                <a href="https://github.com/1minshop/sink.git" target="_blank">
                   <Button
                     size="lg"
                     variant="outline"
