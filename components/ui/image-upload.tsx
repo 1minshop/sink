@@ -25,7 +25,7 @@ export function ImageUpload({
   label = "Image",
   showLabel = true,
   maxSize = 5, // 5MB default
-  acceptedFormats = ["image/jpeg", "image/png", "image/webp", "image/gif"],
+  acceptedFormats = ["image/jpeg","image/jpg", "image/png", "image/webp", "image/gif"],
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(
