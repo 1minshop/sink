@@ -3,14 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Package,
-  ShoppingCart,
-  Heart,
-  Star,
-  Store,
-  ArrowRight,
-} from "lucide-react";
+import { Package, ShoppingCart, Star, Store, ArrowRight } from "lucide-react";
 import { Product } from "@/lib/db/schema";
 import { useCart, useCartActions } from "@/lib/cart/cart-context";
 import { CartSidebar } from "@/components/cart/cart-sidebar";
@@ -57,7 +50,13 @@ function getSubdomainFromHost(): string | null {
   return null;
 }
 
-function ShopHeader({ shopName }: { shopName: string }) {
+function ShopHeader({
+  shopName,
+  showCart = true,
+}: {
+  shopName: string;
+  showCart?: boolean;
+}) {
   const { state } = useCart();
 
   return (
@@ -69,26 +68,24 @@ function ShopHeader({ shopName }: { shopName: string }) {
               {shopName} Store
             </h1>
           </div>
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm" className="hidden sm:flex">
-              <Heart className="h-4 w-4 mr-2" />
-              Wishlist
-            </Button>
-            <CartSidebar>
-              <Button
-                size="sm"
-                className="bg-orange-500 hover:bg-orange-600 relative"
-              >
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                Cart
-                {state.itemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {state.itemCount}
-                  </span>
-                )}
-              </Button>
-            </CartSidebar>
-          </div>
+          {showCart && (
+            <div className="flex items-center gap-4">
+              <CartSidebar>
+                <Button
+                  size="sm"
+                  className="bg-orange-500 hover:bg-orange-600 relative"
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Cart
+                  {state.itemCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {state.itemCount}
+                    </span>
+                  )}
+                </Button>
+              </CartSidebar>
+            </div>
+          )}
         </div>
       </div>
     </header>
@@ -296,7 +293,7 @@ export default function ShopRootPage() {
   if (error || (isClient && !isLoading && products.length === 0)) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <ShopHeader shopName={currentSubdomain} />
+        <ShopHeader shopName={currentSubdomain} showCart={false} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="max-w-2xl mx-auto">
             <Card>
