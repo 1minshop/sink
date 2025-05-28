@@ -24,7 +24,7 @@ export function ImageUpload({
   className = "",
   label = "Image",
   showLabel = true,
-  maxSize = 5, // 5MB default
+  maxSize = 20, // 5MB default
   acceptedFormats = ["image/jpeg","image/jpg", "image/png", "image/webp", "image/gif"],
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
