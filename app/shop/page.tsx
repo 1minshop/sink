@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Package, ShoppingCart, Star, Store, ArrowRight } from "lucide-react";
 import { Product } from "@/lib/db/schema";
 import { useCart, useCartActions } from "@/lib/cart/cart-context";
 import { CartSidebar } from "@/components/cart/cart-sidebar";
+import { ConfirmationPage } from "@/components/shop/confirmation-page";
 import Link from "next/link";
 import useSWR from "swr";
 
@@ -263,11 +265,67 @@ function WelcomePage({
 export default function ShopRootPage() {
   const [currentSubdomain, setCurrentSubdomain] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     setIsClient(true);
     setCurrentSubdomain(getSubdomainFromHost());
   }, []);
+
+  // Check if this is a successful checkout return
+  const isSuccess = searchParams.get("success") === "true";
+  const sessionId = searchParams.get("session_id");
+
+  const handleContinueShopping = async () => {
+    // Remove success parameters from URL and reload the shop
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("success");
+      url.searchParams.delete("session_id");
+
+      // If no subdomain is currently detected, try to get it from session data
+      if (!currentSubdomain && sessionId) {
+        try {
+          const response = await fetch(
+            `/api/stripe/session?session_id=${sessionId}`
+          );
+          if (response.ok) {
+            const sessionData = await response.json();
+            const teamId = sessionData.metadata?.teamId;
+
+            if (teamId) {
+              // Fetch team info to get the subdomain
+              const teamResponse = await fetch(
+                `/api/team-info?teamId=${teamId}`
+              );
+              if (teamResponse.ok) {
+                const teamData = await teamResponse.json();
+                if (teamData.subdomain) {
+                  // Redirect to the correct subdomain
+                  const protocol = url.protocol;
+                  const host = url.host;
+                  const newHost = host.includes("localhost")
+                    ? `${teamData.subdomain}.localhost:3000`
+                    : `${teamData.subdomain}.${host
+                        .split(".")
+                        .slice(1)
+                        .join(".")}`;
+
+                  window.location.href = `${protocol}//${newHost}/shop`;
+                  return;
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching team info:", error);
+        }
+      }
+
+      window.history.replaceState({}, "", url.toString());
+      window.location.reload();
+    }
+  };
 
   // Fetch products for the specific subdomain if available
   const {
@@ -280,6 +338,37 @@ export default function ShopRootPage() {
   );
 
   const currentHost = isClient ? window.location.host : "1minute.shop";
+
+  // If this is a successful checkout, show confirmation page
+  // Even if no subdomain is detected, we can show confirmation using session data
+  if (isSuccess && sessionId) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <ShopHeader
+          shopName={currentSubdomain || "Shop"}
+          subdomain={currentSubdomain}
+          showCart={false}
+        />
+        <main className="flex-1">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <ConfirmationPage
+              sessionId={sessionId}
+              onContinueShopping={handleContinueShopping}
+            />
+          </div>
+        </main>
+        <footer className="py-8 bg-white border-t border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-center items-center">
+              <p className="text-sm text-gray-500 font-bold">
+                Made in Bhutan 🇧🇹 with ❤️
+              </p>
+            </div>
+          </div>
+        </footer>
+      </div>
+    );
+  }
 
   // If no subdomain, show the welcome page
   if (!currentSubdomain) {

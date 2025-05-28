@@ -29,6 +29,20 @@
       "when": 1748434068172,
       "tag": "0003_brainy_ulik",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1748443134354,
+      "tag": "0004_glamorous_tiger_shark",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1748444123454,
+      "tag": "0005_add_payment_methods",
+      "breakpoints": true
     }
   ]
 }

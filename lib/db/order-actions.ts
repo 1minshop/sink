@@ -13,6 +13,10 @@ interface CreateOrderData {
   }>;
   totalAmount: string;
   currency: string;
+  status?: "pending" | "paid" | "completed" | "cancelled";
+  paymentMethod?: "stripe" | "qr_code";
+  stripePaymentIntentId?: string;
+  stripeSessionId?: string;
 }
 
 export async function createOrder(data: CreateOrderData) {
@@ -26,7 +30,10 @@ export async function createOrder(data: CreateOrderData) {
         customerEmail: data.customerEmail,
         totalAmount: data.totalAmount,
         currency: data.currency,
-        status: "pending",
+        status: data.status || "pending",
+        paymentMethod: data.paymentMethod || "qr_code",
+        stripePaymentIntentId: data.stripePaymentIntentId,
+        stripeSessionId: data.stripeSessionId,
       })
       .returning();
 

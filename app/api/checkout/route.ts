@@ -18,6 +18,7 @@ const checkoutSchema = z.object({
     .min(1, "At least one item is required"),
   totalAmount: z.string(),
   currency: z.string(),
+  paymentMethod: z.enum(["stripe", "qr_code"]).default("qr_code"),
 });
 
 export async function POST(request: NextRequest) {
@@ -27,13 +28,17 @@ export async function POST(request: NextRequest) {
     // Validate the request body
     const validatedData = checkoutSchema.parse(body);
 
-    // Create the order
-    const order = await createOrder(validatedData);
+    // Create the order with payment method
+    const order = await createOrder({
+      ...validatedData,
+      paymentMethod: validatedData.paymentMethod,
+    });
 
     return NextResponse.json({
       success: true,
       orderId: order.id,
       message: "Order created successfully",
+      paymentMethod: validatedData.paymentMethod,
     });
   } catch (error) {
     console.error("Error creating order:", error);

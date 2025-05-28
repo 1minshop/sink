@@ -12,6 +12,7 @@ import {
   Trash2,
   Package,
   MoreHorizontal,
+  RefreshCw,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -335,6 +336,7 @@ function CreateProductForm({ onCancel }: { onCancel: () => void }) {
             <ImageUpload
               onImageChange={setImageUrl}
               disabled={isCreatePending}
+              label="Product Image"
             />
             <input type="hidden" name="imageUrl" value={imageUrl || ""} />
           </div>
@@ -504,6 +506,7 @@ function EditProductForm({
               currentImageUrl={product.imageUrl || undefined}
               onImageChange={setImageUrl}
               disabled={isEditPending}
+              label="Product Image"
             />
             <input type="hidden" name="imageUrl" value={imageUrl || ""} />
           </div>
@@ -653,6 +656,8 @@ function EditProductForm({
 export default function ProductsPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
   const { data: products = [], mutate } = useSWR<Product[]>(
     "/api/products",
     fetcher
@@ -689,9 +694,75 @@ export default function ProductsPage() {
     }
   };
 
+  const handleSyncProducts = async () => {
+    setIsSyncing(true);
+    setSyncMessage(null);
+
+    try {
+      const response = await fetch("/api/products/sync", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "sync-all" }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const successCount = result.results.filter(
+          (r: any) => r.success
+        ).length;
+        const totalCount = result.results.length;
+        setSyncMessage(
+          `Successfully synced ${successCount}/${totalCount} products to Stripe`
+        );
+        mutate(); // Refresh the products list
+      } else {
+        setSyncMessage("Failed to sync products to Stripe");
+      }
+    } catch (error) {
+      console.error("Error syncing products:", error);
+      setSyncMessage("Failed to sync products to Stripe");
+    } finally {
+      setIsSyncing(false);
+      // Clear message after 5 seconds
+      setTimeout(() => setSyncMessage(null), 5000);
+    }
+  };
+
   return (
     <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-medium mb-6">Products</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+        <h1 className="text-lg lg:text-2xl font-medium mb-4 sm:mb-0">
+          Products
+        </h1>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleSyncProducts}
+            disabled={isSyncing}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw
+              className={`h-4 w-4 ${isSyncing ? "animate-spin" : ""}`}
+            />
+            {isSyncing ? "Syncing..." : "Sync to Stripe"}
+          </Button>
+        </div>
+      </div>
+
+      {syncMessage && (
+        <div
+          className={`mb-4 p-3 rounded-md ${
+            syncMessage.includes("Successfully")
+              ? "bg-green-50 border border-green-200 text-green-600"
+              : "bg-red-50 border border-red-200 text-red-600"
+          }`}
+        >
+          {syncMessage}
+        </div>
+      )}
 
       {showCreateForm ? (
         <CreateProductForm onCancel={handleCancelCreate} />

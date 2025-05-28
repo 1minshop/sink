@@ -31,6 +31,12 @@ export const teams = pgTable("teams", {
   stripeProductId: text("stripe_product_id"),
   planName: varchar("plan_name", { length: 50 }),
   subscriptionStatus: varchar("subscription_status", { length: 20 }),
+  // QR Code Payment Settings
+  qrCodeImageUrl: text("qr_code_image_url"),
+  qrCodePaymentName: varchar("qr_code_payment_name", { length: 255 }),
+  qrCodePaymentDetails: text("qr_code_payment_details"),
+  enableQrPayment: boolean("enable_qr_payment").notNull().default(false),
+  enableStripePayment: boolean("enable_stripe_payment").notNull().default(true),
 });
 
 export const teamMembers = pgTable("team_members", {
@@ -83,6 +89,8 @@ export const products = pgTable("products", {
   inventory: integer("inventory").default(0),
   active: boolean("active").notNull().default(true),
   imageUrl: text("image_url"),
+  stripeProductId: text("stripe_product_id").unique(),
+  stripePriceId: text("stripe_price_id").unique(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -97,6 +105,11 @@ export const orders = pgTable("orders", {
   status: varchar("status", { length: 20 }).notNull().default("pending"),
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
   currency: varchar("currency", { length: 3 }).notNull().default("USD"),
+  paymentMethod: varchar("payment_method", { length: 20 })
+    .notNull()
+    .default("qr_code"), // 'stripe' or 'qr_code'
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  stripeSessionId: text("stripe_session_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

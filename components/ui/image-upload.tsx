@@ -10,12 +10,22 @@ interface ImageUploadProps {
   currentImageUrl?: string;
   onImageChange: (imageUrl: string | null) => void;
   disabled?: boolean;
+  className?: string;
+  label?: string;
+  showLabel?: boolean;
+  maxSize?: number; // in MB
+  acceptedFormats?: string[];
 }
 
 export function ImageUpload({
   currentImageUrl,
   onImageChange,
   disabled,
+  className = "",
+  label = "Image",
+  showLabel = true,
+  maxSize = 5, // 5MB default
+  acceptedFormats = ["image/jpeg", "image/png", "image/webp", "image/gif"],
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(
@@ -37,16 +47,27 @@ export function ImageUpload({
     });
 
     // Validate file type
-    if (!file.type.startsWith("image/")) {
+    if (
+      !acceptedFormats.some(
+        (format) =>
+          file.type === format ||
+          file.type.startsWith(format.split("/")[0] + "/")
+      )
+    ) {
       console.error("❌ Invalid file type:", file.type);
-      alert("Please select an image file");
+      alert(
+        `Please select a valid image file. Accepted formats: ${acceptedFormats.join(
+          ", "
+        )}`
+      );
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Validate file size (default 5MB)
+    const maxSizeBytes = maxSize * 1024 * 1024;
+    if (file.size > maxSizeBytes) {
       console.error("❌ File too large:", file.size, "bytes");
-      alert("Image size must be less than 5MB");
+      alert(`Image size must be less than ${maxSize}MB`);
       return;
     }
 
@@ -130,15 +151,15 @@ export function ImageUpload({
   };
 
   return (
-    <div className="space-y-2">
-      <Label className="text-sm font-medium">Product Image</Label>
+    <div className={`space-y-2 ${className}`}>
+      {showLabel && <Label className="text-sm font-medium">{label}</Label>}
 
       <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
         {previewUrl ? (
           <div className="relative">
             <img
               src={previewUrl}
-              alt="Product preview"
+              alt={`${label} preview`}
               className="w-full h-48 object-cover rounded-md"
             />
             {!disabled && (
@@ -156,7 +177,9 @@ export function ImageUpload({
         ) : (
           <div className="text-center py-8">
             <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <p className="mt-2 text-sm text-gray-500">No image uploaded</p>
+            <p className="mt-2 text-sm text-gray-500">
+              No {label.toLowerCase()} uploaded
+            </p>
           </div>
         )}
       </div>
@@ -174,14 +197,14 @@ export function ImageUpload({
             {isUploading
               ? "Uploading..."
               : previewUrl
-              ? "Change Image"
-              : "Upload Image"}
+              ? `Change ${label}`
+              : `Upload ${label}`}
           </Button>
 
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept={acceptedFormats.join(",")}
             onChange={handleFileSelect}
             className="hidden"
           />
@@ -189,7 +212,9 @@ export function ImageUpload({
       )}
 
       <p className="text-xs text-gray-500">
-        Supported formats: JPEG, PNG, WebP. Max size: 5MB.
+        Supported formats:{" "}
+        {acceptedFormats.map((f) => f.split("/")[1].toUpperCase()).join(", ")}.
+        Max size: {maxSize}MB.
       </p>
     </div>
   );

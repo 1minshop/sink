@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useCart, useCartActions } from "@/lib/cart/cart-context";
 import { ArrowLeft, CreditCard } from "lucide-react";
+import { PaymentMethodSelector } from "./payment-method-selector";
+import { QRCodePayment } from "./qr-code-payment";
 
 interface CheckoutFormProps {
   onBack: () => void;
@@ -14,19 +16,106 @@ interface CheckoutFormProps {
   teamId: number;
 }
 
+interface TeamPaymentSettings {
+  enableStripePayment: boolean;
+  enableQrPayment: boolean;
+  qrCodeImageUrl?: string;
+  qrCodePaymentName?: string;
+  qrCodePaymentDetails?: string;
+}
+
 export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
   const { state } = useCart();
   const { clearCart } = useCartActions();
   const [loading, setLoading] = useState(false);
+  const [paymentSettings, setPaymentSettings] =
+    useState<TeamPaymentSettings | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "qr_code">(
+    "qr_code"
+  );
+  const [currentStep, setCurrentStep] = useState<"details" | "payment">(
+    "details"
+  );
+  const [orderId, setOrderId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     customerName: "",
     customerEmail: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  // Fetch payment settings on component mount
+  useEffect(() => {
+    const fetchPaymentSettings = async () => {
+      try {
+        const response = await fetch(`/api/payment-settings?teamId=${teamId}`);
+        if (response.ok) {
+          const settings = await response.json();
+          setPaymentSettings(settings);
 
+          // Set default payment method based on available options
+          if (settings.enableQrPayment) {
+            setPaymentMethod("qr_code");
+          } else if (settings.enableStripePayment) {
+            setPaymentMethod("stripe");
+          }
+        } else {
+          throw new Error("Failed to fetch payment settings");
+        }
+      } catch (error) {
+        console.error("Error fetching payment settings:", error);
+        toast.error("Failed to load payment methods");
+      }
+    };
+
+    fetchPaymentSettings();
+  }, [teamId]);
+
+  const handleStripeCheckout = async () => {
+    setLoading(true);
+    try {
+      const orderData = {
+        teamId,
+        customerName: formData.customerName,
+        customerEmail: formData.customerEmail,
+        items: state.items.map((item) => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+          price: item.product.price,
+          currency: item.product.currency,
+          name: item.product.name,
+          description: item.product.description || "",
+        })),
+        totalAmount: state.total.toFixed(2),
+        currency: state.items[0]?.product.currency || "USD",
+      };
+
+      const response = await fetch("/api/stripe/product-checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to create checkout session");
+      }
+
+      // Redirect to Stripe checkout
+      window.location.href = result.url;
+    } catch (error) {
+      console.error("Stripe checkout error:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to initialize payment"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleQRCodeOrder = async () => {
+    setLoading(true);
     try {
       const orderData = {
         teamId,
@@ -40,6 +129,7 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
         })),
         totalAmount: state.total.toFixed(2),
         currency: state.items[0]?.product.currency || "USD",
+        paymentMethod: "qr_code",
       };
 
       const response = await fetch("/api/checkout", {
@@ -56,24 +146,34 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
         throw new Error(result.error || "Failed to create order");
       }
 
-      // Clear cart and show success
-      clearCart();
-      toast.success("Order placed successfully!", {
-        duration: 1000,
-      });
-
-      onSuccess();
+      setOrderId(result.orderId);
+      setCurrentStep("payment");
     } catch (error) {
-      console.error("Checkout error:", error);
+      console.error("QR Code order error:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to place order",
-        {
-          duration: 1000,
-        }
+        error instanceof Error ? error.message : "Failed to create order"
       );
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (paymentMethod === "stripe") {
+      await handleStripeCheckout();
+    } else {
+      await handleQRCodeOrder();
+    }
+  };
+
+  const handlePaymentConfirm = () => {
+    clearCart();
+    toast.success("Order completed successfully!", {
+      duration: 2000,
+    });
+    onSuccess();
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -82,6 +182,53 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
 
   const isFormValid =
     formData.customerName.trim() && formData.customerEmail.trim();
+
+  // Show QR code payment screen
+  if (
+    currentStep === "payment" &&
+    paymentMethod === "qr_code" &&
+    orderId &&
+    paymentSettings
+  ) {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="px-6 py-5 border-b border-gray-200">
+          <div className="flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentStep("details")}
+              className="p-2 hover:bg-gray-100 rounded-lg"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <h2 className="text-xl font-semibold">Payment</h2>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-6 py-6">
+          <QRCodePayment
+            qrCodeImageUrl={paymentSettings.qrCodeImageUrl}
+            paymentName={paymentSettings.qrCodePaymentName}
+            paymentDetails={paymentSettings.qrCodePaymentDetails}
+            totalAmount={state.total.toFixed(2)}
+            currency={state.items[0]?.product.currency || "USD"}
+            orderId={orderId}
+            onPaymentConfirm={handlePaymentConfirm}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (!paymentSettings) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center">
+        <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+        <p className="mt-2 text-muted-foreground">Loading payment options...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -150,6 +297,14 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
             </div>
           </div>
 
+          {/* Payment Method Selection */}
+          <PaymentMethodSelector
+            selectedMethod={paymentMethod}
+            onMethodChange={setPaymentMethod}
+            enableStripe={paymentSettings.enableStripePayment}
+            enableQrCode={paymentSettings.enableQrPayment}
+          />
+
           {/* Order Summary */}
           <div className="space-y-4 bg-gray-50 p-5 rounded-xl">
             <h3 className="text-lg font-semibold text-gray-900">
@@ -191,7 +346,12 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
         <Button
           type="submit"
           onClick={handleSubmit}
-          disabled={!isFormValid || loading}
+          disabled={
+            !isFormValid ||
+            loading ||
+            (!paymentSettings.enableStripePayment &&
+              !paymentSettings.enableQrPayment)
+          }
           className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
@@ -202,13 +362,19 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
           ) : (
             <div className="flex items-center space-x-2">
               <CreditCard className="h-4 w-4" />
-              <span>Place Order</span>
+              <span>
+                {paymentMethod === "stripe"
+                  ? "Pay with Card"
+                  : "Continue to Payment"}
+              </span>
             </div>
           )}
         </Button>
 
         <p className="text-xs text-gray-500 text-center mt-3">
-          Your order will be processed and you'll receive a confirmation email.
+          {paymentMethod === "stripe"
+            ? "You'll be redirected to Stripe to complete your payment securely. Promo codes can be applied during checkout."
+            : "You'll be shown payment instructions after placing your order."}
         </p>
       </div>
     </div>
