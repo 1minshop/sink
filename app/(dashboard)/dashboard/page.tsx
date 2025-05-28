@@ -150,7 +150,7 @@ function ProductTable({
                     </div>
                   </td>
                   <td className="py-3 px-4 text-gray-900">
-                    {product.currency === "BTN" ? "Nu. " : "$ "}
+                    {product.currency === "INR" ? "₹ " : "$ "}
                     {product.price} {product.currency}
                   </td>
                   <td className="py-3 px-4 text-gray-500">
@@ -264,7 +264,7 @@ function ProductTable({
                       <div>
                         <span className="text-gray-500">Price:</span>
                         <span className="ml-1 font-medium text-gray-900">
-                          {product.currency === "BTN" ? "Nu." : "$"}
+                          {product.currency === "INR" ? "₹" : "$"}
                           {product.price} {product.currency}
                         </span>
                       </div>
@@ -401,10 +401,10 @@ function CreateProductForm({ onCancel }: { onCancel: () => void }) {
               <select
                 id="currency"
                 name="currency"
-                defaultValue="BTN"
+                defaultValue="INR"
                 className="w-full h-10 px-3 py-2 text-sm border border-input bg-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
               >
-                <option value="BTN">BTN (Bhutanese Ngultrum)</option>
+                <option value="INR">INR (Indian Rupee)</option>
                 <option value="USD">USD (US Dollar)</option>
               </select>
             </div>
