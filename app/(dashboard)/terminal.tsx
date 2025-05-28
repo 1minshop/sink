@@ -7,7 +7,7 @@ export function Terminal() {
   const [terminalStep, setTerminalStep] = useState(0);
   const [copied, setCopied] = useState(false);
   const terminalSteps = [
-    'git clone https://github.com/1minshop/sink.git',
+    'https://github.com/C-gyeltshen/1minute.shop.git',
     'pnpm install',
     'pnpm db:setup',
     'pnpm db:migrate',
