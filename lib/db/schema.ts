@@ -87,11 +87,39 @@ export const products = pgTable("products", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  teamId: integer("team_id")
+    .notNull()
+    .references(() => teams.id),
+  customerName: varchar("customer_name", { length: 255 }).notNull(),
+  customerEmail: varchar("customer_email", { length: 255 }).notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("pending"),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).notNull().default("USD"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const orderItems = pgTable("order_items", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id")
+    .notNull()
+    .references(() => orders.id),
+  productId: integer("product_id")
+    .notNull()
+    .references(() => products.id),
+  quantity: integer("quantity").notNull(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).notNull().default("USD"),
+});
+
 export const teamsRelations = relations(teams, ({ many }) => ({
   teamMembers: many(teamMembers),
   activityLogs: many(activityLogs),
   invitations: many(invitations),
   products: many(products),
+  orders: many(orders),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -121,10 +149,30 @@ export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
   }),
 }));
 
-export const productsRelations = relations(products, ({ one }) => ({
+export const productsRelations = relations(products, ({ one, many }) => ({
   team: one(teams, {
     fields: [products.teamId],
     references: [teams.id],
+  }),
+  orderItems: many(orderItems),
+}));
+
+export const ordersRelations = relations(orders, ({ one, many }) => ({
+  team: one(teams, {
+    fields: [orders.teamId],
+    references: [teams.id],
+  }),
+  orderItems: many(orderItems),
+}));
+
+export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+  order: one(orders, {
+    fields: [orderItems.orderId],
+    references: [orders.id],
+  }),
+  product: one(products, {
+    fields: [orderItems.productId],
+    references: [products.id],
   }),
 }));
 
@@ -151,6 +199,10 @@ export type Invitation = typeof invitations.$inferSelect;
 export type NewInvitation = typeof invitations.$inferInsert;
 export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;
+export type Order = typeof orders.$inferSelect;
+export type NewOrder = typeof orders.$inferInsert;
+export type OrderItem = typeof orderItems.$inferSelect;
+export type NewOrderItem = typeof orderItems.$inferInsert;
 export type TeamDataWithMembers = Team & {
   teamMembers: (TeamMember & {
     user: Pick<User, "id" | "name" | "email">;

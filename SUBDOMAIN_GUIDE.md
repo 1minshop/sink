@@ -41,9 +41,9 @@ If you have a domain, you can set up DNS A records:
 
 ## URL Structure
 
-- **Main App**: `localhost:3000`, `1min.shop`, or `yourdomain.com`
-- **Shopfront**: `[subdomain].localhost:3000`, `[subdomain].1min.shop`, or `[subdomain].yourdomain.com`
-- **Dashboard**: `localhost:3000/dashboard`, `1min.shop/dashboard` (protected route)
+- **Main App**: `localhost:3000`, `1minute.shop`, or `yourdomain.com`
+- **Shopfront**: `[subdomain].localhost:3000`, `[subdomain].1minute.shop`, or `[subdomain].yourdomain.com`
+- **Dashboard**: `localhost:3000/dashboard`, `1minute.shop/dashboard` (protected route)
 
 ## Examples
 
@@ -54,13 +54,13 @@ If you have a domain, you can set up DNS A records:
   - `http://shop1.localhost:3000`
   - `http://mystore.localhost:3000`
 
-### Production (1min.shop):
+### Production (1minute.shop):
 
-- Main app: `https://1min.shop`
+- Main app: `https://1minute.shop`
 - Shopfronts:
-  - `https://shop1.1min.shop`
-  - `https://mystore.1min.shop`
-  - `https://demo.1min.shop`
+  - `https://shop1.1minute.shop`
+  - `https://mystore.1minute.shop`
+  - `https://demo.1minute.shop`
 
 ### Production (Custom Domain):
 

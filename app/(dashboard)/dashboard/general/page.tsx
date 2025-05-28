@@ -34,7 +34,7 @@ function AccountForm({
     <>
       <div>
         <Label htmlFor="name" className="mb-2">
-          Name
+          Shop Name
         </Label>
         <Input
           id="name"

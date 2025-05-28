@@ -32,10 +32,10 @@ function getSubdomainFromHost(): string | null {
     return subdomain === "localhost" ? null : subdomain;
   }
 
-  // For 1min.shop domain (e.g., shop1.1min.shop)
+  // For 1minute.shop domain (e.g., shop1.1minute.shop)
   if (
     parts.length >= 3 &&
-    parts[parts.length - 2] === "1min" &&
+    parts[parts.length - 2] === "1minute" &&
     parts[parts.length - 1] === "shop"
   ) {
     const subdomain = parts[0];
@@ -52,9 +52,11 @@ function getSubdomainFromHost(): string | null {
 
 function ShopHeader({
   shopName,
+  subdomain,
   showCart = true,
 }: {
   shopName: string;
+  subdomain?: string | null;
   showCart?: boolean;
 }) {
   const { state } = useCart();
@@ -70,7 +72,7 @@ function ShopHeader({
           </div>
           {showCart && (
             <div className="flex items-center gap-4">
-              <CartSidebar>
+              <CartSidebar subdomain={subdomain}>
                 <Button
                   size="sm"
                   className="bg-orange-500 hover:bg-orange-600 relative"
@@ -277,7 +279,7 @@ export default function ShopRootPage() {
     fetcher
   );
 
-  const currentHost = isClient ? window.location.host : "1min.shop";
+  const currentHost = isClient ? window.location.host : "1minute.shop";
 
   // If no subdomain, show the welcome page
   if (!currentSubdomain) {
@@ -293,7 +295,11 @@ export default function ShopRootPage() {
   if (error || (isClient && !isLoading && products.length === 0)) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <ShopHeader shopName={currentSubdomain} showCart={false} />
+        <ShopHeader
+          shopName={currentSubdomain}
+          subdomain={currentSubdomain}
+          showCart={false}
+        />
         <main className="flex-1">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="max-w-2xl mx-auto">
@@ -394,7 +400,7 @@ export default function ShopRootPage() {
   // Show the shop with products
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <ShopHeader shopName={currentSubdomain} />
+      <ShopHeader shopName={currentSubdomain} subdomain={currentSubdomain} />
 
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

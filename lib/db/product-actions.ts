@@ -137,3 +137,36 @@ export async function getProductsByUserName(
     return [];
   }
 }
+
+export async function getTeamIdByUserName(
+  userName: string
+): Promise<number | null> {
+  try {
+    // First find the user by name
+    const user = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.name, userName))
+      .limit(1);
+
+    if (user.length === 0) {
+      return null;
+    }
+
+    // Then find their team
+    const teamMember = await db
+      .select({ teamId: teamMembers.teamId })
+      .from(teamMembers)
+      .where(eq(teamMembers.userId, user[0].id))
+      .limit(1);
+
+    if (teamMember.length === 0) {
+      return null;
+    }
+
+    return teamMember[0].teamId;
+  } catch (error) {
+    console.error("Error fetching team ID by user name:", error);
+    return null;
+  }
+}

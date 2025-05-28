@@ -26,7 +26,7 @@ function getSubdomainFromHost(): string | null {
     return subdomain === "localhost" ? null : subdomain;
   }
 
-  // For 1min.shop domain (e.g., shop1.1min.shop)
+  // For 1minute.shop domain (e.g., shop1.1minute.shop)
   if (
     parts.length >= 3 &&
     parts[parts.length - 2] === "1min" &&
@@ -121,7 +121,7 @@ function LandingPage({ currentHost }: { currentHost: string }) {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <Binary className="h-6 w-6 text-orange-500 mr-2" />
-              <h1 className="text-xl font-bold text-gray-900">1min.shop</h1>
+              <h1 className="text-xl font-bold text-gray-900">1minute.shop</h1>
             </div>
             <div className="flex items-center gap-4">
               <Link href="/sign-in">
@@ -172,7 +172,7 @@ function LandingPage({ currentHost }: { currentHost: string }) {
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </a>
-                  <a href="http://1min.shop/sign-up" target="_blank">
+                  <a href="http://1minute.shop/sign-up" target="_blank">
                     <Button
                       size="lg"
                       variant="default"
@@ -360,7 +360,7 @@ export default function HomePage() {
     );
   }
 
-  const currentHost = isClient ? window.location.host : "1min.shop";
+  const currentHost = isClient ? window.location.host : "1minute.shop";
 
   // Show landing page for main domain
   return <LandingPage currentHost={currentHost} />;

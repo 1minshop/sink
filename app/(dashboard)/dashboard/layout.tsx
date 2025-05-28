@@ -11,6 +11,7 @@ import {
   Activity,
   Menu,
   ShoppingBagIcon,
+  Package,
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -23,6 +24,7 @@ export default function DashboardLayout({
 
   const navItems = [
     { href: "/dashboard", icon: ShoppingBagIcon, label: "Products" },
+    { href: "/dashboard/orders", icon: Package, label: "Orders" },
     { href: "/dashboard/team", icon: Users, label: "Team" },
     { href: "/dashboard/general", icon: Settings, label: "General" },
     { href: "/dashboard/activity", icon: Activity, label: "Activity" },

@@ -24,7 +24,7 @@
 ### 4. **Domain Pattern Support**
 
 - ✅ `test.localhost:3000` (development)
-- ✅ `test.1min.shop` (production)
+- ✅ `test.1minute.shop` (production)
 - ✅ `test.yourdomain.com` (custom domains)
 
 ## 🔄 How It Works
