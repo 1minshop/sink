@@ -139,13 +139,13 @@ function QRCodeButton() {
           dark: "#000000",
           light: "#FFFFFF",
         },
-        errorCorrectionLevel: 'H' // High error correction to allow for logo overlay
+        errorCorrectionLevel: "H", // High error correction to allow for logo overlay
       });
 
       // Create canvas to add logo overlay
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Could not get canvas context');
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Could not get canvas context");
 
       canvas.width = 256;
       canvas.height = 256;
@@ -166,26 +166,38 @@ function QRCodeButton() {
       const logoY = (256 - logoSize) / 2;
 
       // Draw white background circle for logo
-      ctx.fillStyle = '#FFFFFF';
+      ctx.fillStyle = "#FFFFFF";
       ctx.beginPath();
-      ctx.arc(logoX + logoSize / 2, logoY + logoSize / 2, logoSize / 2 + 4, 0, 2 * Math.PI);
+      ctx.arc(
+        logoX + logoSize / 2,
+        logoY + logoSize / 2,
+        logoSize / 2 + 4,
+        0,
+        2 * Math.PI
+      );
       ctx.fill();
 
       // Draw orange background circle
-      ctx.fillStyle = '#F97316'; // Orange-500
+      ctx.fillStyle = "#F97316"; // Orange-500
       ctx.beginPath();
-      ctx.arc(logoX + logoSize / 2, logoY + logoSize / 2, logoSize / 2, 0, 2 * Math.PI);
+      ctx.arc(
+        logoX + logoSize / 2,
+        logoY + logoSize / 2,
+        logoSize / 2,
+        0,
+        2 * Math.PI
+      );
       ctx.fill();
 
       // Draw "1M" text as logo
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 16px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('1M', logoX + logoSize / 2, logoY + logoSize / 2);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 16px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("1M", logoX + logoSize / 2, logoY + logoSize / 2);
 
       // Get the final image with logo
-      const finalDataUrl = canvas.toDataURL('image/png');
+      const finalDataUrl = canvas.toDataURL("image/png");
       setQrCodeDataUrl(finalDataUrl);
     } catch (error) {
       console.error("Error generating QR code:", error);
@@ -394,8 +406,8 @@ function Header() {
     <header className="border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center">
-          <Binary className="h-6 w-6 text-orange-500" />
-          <span className="ml-2 text-xl font-semibold text-gray-900">
+          <Binary className="h-8 w-8 sm:h-6 sm:w-6 text-orange-500" />
+          <span className="ml-2 text-xl font-semibold text-gray-900 hidden sm:inline">
             1 Minute
           </span>
         </Link>

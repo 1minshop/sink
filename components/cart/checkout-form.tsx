@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useCart, useCartActions } from "@/lib/cart/cart-context";
-import { ArrowLeft, CreditCard } from "lucide-react";
+import { ArrowLeft, CreditCard, QrCode } from "lucide-react";
 import { PaymentMethodSelector } from "./payment-method-selector";
 import { QRCodePayment } from "./qr-code-payment";
 
@@ -318,7 +318,7 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
                     {item.product.name} × {item.quantity}
                   </span>
                   <span className="font-medium">
-                    {item.product.currency === "BTN" ? "Nu. " : "$ "}
+                    {item.product.currency === "INR" ? "₹" : "$ "}
                     {(parseFloat(item.product.price) * item.quantity).toFixed(
                       2
                     )}
@@ -331,7 +331,7 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
               <div className="flex justify-between text-base font-semibold">
                 <span>Total</span>
                 <span className="text-orange-600">
-                  {state.items[0]?.product.currency === "BTN" ? "Nu. " : "$ "}
+                  {state.items[0]?.product.currency === "INR" ? "₹" : "$ "}
                   {state.total.toFixed(2)}{" "}
                   {state.items[0]?.product.currency || "USD"}
                 </span>
@@ -361,11 +361,15 @@ export function CheckoutForm({ onBack, onSuccess, teamId }: CheckoutFormProps) {
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <CreditCard className="h-4 w-4" />
+              {paymentMethod === "stripe" ? (
+                <CreditCard className="h-4 w-4" />
+              ) : (
+                <QrCode className="h-4 w-4" />
+              )}
               <span>
                 {paymentMethod === "stripe"
                   ? "Pay with Card"
-                  : "Continue to Payment"}
+                  : "Pay with QR Code"}
               </span>
             </div>
           )}
