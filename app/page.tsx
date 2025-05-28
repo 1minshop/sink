@@ -29,7 +29,7 @@ function getSubdomainFromHost(): string | null {
   // For 1minute.shop domain (e.g., shop1.1minute.shop)
   if (
     parts.length >= 3 &&
-    parts[parts.length - 2] === "1min" &&
+    parts[parts.length - 2] === "1minute" &&
     parts[parts.length - 1] === "shop"
   ) {
     const subdomain = parts[0];
