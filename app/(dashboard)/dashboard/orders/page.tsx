@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -153,9 +154,11 @@ function OrderCard({ order }: { order: Order }) {
                   <div className="flex items-center space-x-3">
                     <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden">
                       {item.product.imageUrl ? (
-                        <img
+                        <Image
                           src={item.product.imageUrl}
                           alt={item.product.name}
+                          width={48}
+                          height={48}
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -285,7 +288,8 @@ export default function OrdersPage() {
         {searchEmail && (
           <p className="text-sm text-gray-600 mt-2">
             {filteredOrders.length} order
-            {filteredOrders.length !== 1 ? "s" : ""} found for "{searchEmail}"
+            {filteredOrders.length !== 1 ? "s" : ""} found for &ldquo;
+            {searchEmail}&rdquo;
           </p>
         )}
       </div>
@@ -318,8 +322,8 @@ export default function OrdersPage() {
                 No orders found
               </h3>
               <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                No orders found for the email address "{searchEmail}". Try a
-                different search term.
+                No orders found for the email address &ldquo;{searchEmail}
+                &rdquo;. Try a different search term.
               </p>
               <Button
                 variant="outline"

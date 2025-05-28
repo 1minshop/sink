@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -262,7 +262,8 @@ function WelcomePage({
   );
 }
 
-export default function ShopRootPage() {
+// Component that uses useSearchParams - must be wrapped in Suspense
+function ShopContent() {
   const [currentSubdomain, setCurrentSubdomain] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
   const searchParams = useSearchParams();
@@ -553,5 +554,21 @@ export default function ShopRootPage() {
         </div>
       </footer>
     </div>
+  );
+}
+
+// Main component that wraps ShopContent in Suspense
+export default function ShopRootPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading shop...</p>
+        </div>
+      </div>
+    }>
+      <ShopContent />
+    </Suspense>
   );
 }
