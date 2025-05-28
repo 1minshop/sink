@@ -8,7 +8,8 @@ This is a starter template for building a E-Commerce SaaS application using **Ne
 - Pricing page (`/pricing`) which connects to Stripe Checkout
 - Dashboard pages with CRUD operations on users/teams
 - **Product Management** with image upload capabilities
-- **Subdomain Shopfront** - Automatic routing to individual stores via subdomains
+- **Subdomain Shopfront** - Validated user-specific stores via subdomains
+- **User Validation** - Only registered users can have shopfronts
 - Basic RBAC with Owner and Member roles
 - Subscription management with Stripe Customer Portal
 - Email/password authentication with JWTs stored to cookies
@@ -78,17 +79,23 @@ To test the subdomain shopfront functionality locally:
    ./scripts/setup-subdomains.sh
    ```
 
-2. **Create some products** in the dashboard:
+2. **Create a user account**:
+
+   - Visit `http://localhost:3000/sign-up`
+   - Set your name during registration (this becomes your subdomain)
+
+3. **Create products** in the dashboard:
 
    - Visit `http://localhost:3000/dashboard`
    - Add products with images
 
-3. **Test shopfronts**:
-   - `http://shop1.localhost:3000` - Individual store
-   - `http://shop2.localhost:3000` - Another store
-   - `http://mystore.localhost:3000` - Custom store
+4. **Test your shopfront**:
+   - `http://[yourname].localhost:3000` - Your personal store
+   - Invalid subdomains redirect to `/shop`
 
-See `SUBDOMAIN_GUIDE.md` for detailed setup and troubleshooting.
+**Subdomain Validation**: Only users with matching names can have shopfronts. For example, if you register with name "john", you can access `http://john.localhost:3000`.
+
+See `SUBDOMAIN_GUIDE.md` for detailed setup and `SUBDOMAIN_VALIDATION_COMPLETE.md` for implementation details.
 
 You can listen for Stripe webhooks locally through their CLI to handle subscription change events:
 

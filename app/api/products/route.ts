@@ -1,9 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getTeamProducts } from "@/lib/db/product-actions";
+import {
+  getTeamProducts,
+  getProductsByUserName,
+} from "@/lib/db/product-actions";
 
 export async function GET(request: NextRequest) {
   try {
-    const products = await getTeamProducts();
+    const { searchParams } = new URL(request.url);
+    const subdomain = searchParams.get("subdomain");
+
+    let products;
+    if (subdomain) {
+      // Get products for specific user/store
+      products = await getProductsByUserName(subdomain);
+    } else {
+      // Get products for current user's team (dashboard view)
+      products = await getTeamProducts();
+    }
+
     return NextResponse.json(products);
   } catch (error) {
     console.error("Error fetching products:", error);

@@ -6,27 +6,6 @@ const protectedRoutes = "/dashboard";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const hostname = request.headers.get("host") || "";
-
-  // Extract subdomain from hostname
-  const subdomain = getSubdomain(hostname);
-
-  // Handle subdomain routing to shopfront
-  if (
-    subdomain &&
-    subdomain !== "www" &&
-    !pathname.startsWith("/api") &&
-    !pathname.startsWith("/_next")
-  ) {
-    // Check if it's already a shopfront route to avoid infinite redirect
-    if (!pathname.startsWith("/shop")) {
-      const shopfrontUrl = new URL(
-        `/shop/${subdomain}${pathname}`,
-        request.url
-      );
-      return NextResponse.rewrite(shopfrontUrl);
-    }
-  }
 
   const sessionCookie = request.cookies.get("session");
   const isProtectedRoute = pathname.startsWith(protectedRoutes);
@@ -63,42 +42,6 @@ export async function middleware(request: NextRequest) {
   }
 
   return res;
-}
-
-function getSubdomain(hostname: string): string | null {
-  // Remove port if present
-  const host = hostname.split(":")[0];
-
-  // Split by dots
-  const parts = host.split(".");
-
-  // // For localhost development, treat the first part as subdomain if it's not localhost
-  // if (parts.length === 1 && parts[0] === "localhost") {
-  //   return null;
-  // }
-
-  // // For development with custom hosts (e.g., shop1.localhost:3000)
-  // if (parts.length >= 2 && parts[parts.length - 1] === "localhost") {
-  //   const subdomain = parts[0];
-  //   return subdomain === "localhost" ? null : subdomain;
-  // }
-
-  // For 1min.shop domain (e.g., shop1.1min.shop)
-  if (
-    parts.length >= 3 &&
-    parts[parts.length - 2] === "1min" &&
-    parts[parts.length - 1] === "shop"
-  ) {
-    const subdomain = parts[0];
-    return subdomain === "www" ? null : subdomain;
-  }
-
-  // // For production domains (e.g., shop1.example.com)
-  // if (parts.length >= 3) {
-  //   return parts[0];
-  // }
-
-  return null;
 }
 
 export const config = {

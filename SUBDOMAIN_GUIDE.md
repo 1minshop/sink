@@ -78,8 +78,9 @@ If you have a domain, you can set up DNS A records:
 - ✅ Product images with fallbacks
 - ✅ Stock status indicators
 - ✅ Add to cart buttons
-- ✅ Search and filtering (future)
-- ✅ Shopping cart (future)
+- ✅ User validation (subdomain must match user name)
+- ✅ Invalid subdomain redirect to /shop
+- ✅ User-specific product filtering
 
 ### Middleware (`middleware.ts`):
 
@@ -114,9 +115,9 @@ If you have a domain, you can set up DNS A records:
 
 ## Current Limitations
 
-1. **All products shown**: Currently shows all products for any subdomain
-2. **No user association**: Products aren't filtered by store owner yet
-3. **No cart functionality**: Add to cart buttons are placeholders
+1. **User-based validation**: Only users with matching names can have shopfronts
+2. **No cart functionality**: Add to cart buttons are placeholders
+3. **Case-sensitive matching**: Subdomain must exactly match user's name field
 
 ## Future Enhancements
 

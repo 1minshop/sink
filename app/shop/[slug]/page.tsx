@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Package, ShoppingCart, Heart, Star } from "lucide-react";
 import { Product } from "@/lib/db/schema";
+import { useCart, useCartActions } from "@/lib/cart/cart-context";
+import { CartSidebar } from "@/components/cart/cart-sidebar";
 import useSWR from "swr";
 
 const fetcher = (url: string) =>
@@ -18,6 +20,8 @@ const fetcher = (url: string) =>
     });
 
 function ShopHeader({ shopName }: { shopName: string }) {
+  const { state } = useCart();
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -32,10 +36,20 @@ function ShopHeader({ shopName }: { shopName: string }) {
               <Heart className="h-4 w-4 mr-2" />
               Wishlist
             </Button>
-            <Button size="sm" className="bg-orange-500 hover:bg-orange-600">
-              <ShoppingCart className="h-4 w-4 mr-2" />
-              Cart
-            </Button>
+            <CartSidebar>
+              <Button
+                size="sm"
+                className="bg-orange-500 hover:bg-orange-600 relative"
+              >
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                Cart
+                {state.itemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {state.itemCount}
+                  </span>
+                )}
+              </Button>
+            </CartSidebar>
           </div>
         </div>
       </div>
@@ -44,6 +58,12 @@ function ShopHeader({ shopName }: { shopName: string }) {
 }
 
 function ProductCard({ product }: { product: Product }) {
+  const { addItem } = useCartActions();
+
+  const handleAddToCart = () => {
+    addItem(product);
+  };
+
   return (
     <Card className="h-full hover:shadow-lg transition-shadow duration-200">
       <CardContent className="p-0">
@@ -115,6 +135,7 @@ function ProductCard({ product }: { product: Product }) {
               !product.active ||
               (product.inventory !== null && product.inventory <= 0)
             }
+            onClick={handleAddToCart}
           >
             <ShoppingCart className="w-4 h-4 mr-2" />
             {!product.active ||
@@ -159,12 +180,12 @@ export default function ShopPage() {
   const params = useParams();
   const shopName = params.slug as string;
 
-  // Fetch products - in a real app, you'd filter by shop owner
+  // Fetch products for this specific store
   const {
     data: products = [],
     error,
     isLoading,
-  } = useSWR<Product[]>("/api/products", fetcher);
+  } = useSWR<Product[]>(`/api/products?subdomain=${shopName}`, fetcher);
 
   if (error) {
     return (
