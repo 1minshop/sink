@@ -72,16 +72,16 @@ function getSubdomain(hostname: string): string | null {
   // Split by dots
   const parts = host.split(".");
 
-  // For localhost development, treat the first part as subdomain if it's not localhost
-  if (parts.length === 1 && parts[0] === "localhost") {
-    return null;
-  }
+  // // For localhost development, treat the first part as subdomain if it's not localhost
+  // if (parts.length === 1 && parts[0] === "localhost") {
+  //   return null;
+  // }
 
-  // For development with custom hosts (e.g., shop1.localhost:3000)
-  if (parts.length >= 2 && parts[parts.length - 1] === "localhost") {
-    const subdomain = parts[0];
-    return subdomain === "localhost" ? null : subdomain;
-  }
+  // // For development with custom hosts (e.g., shop1.localhost:3000)
+  // if (parts.length >= 2 && parts[parts.length - 1] === "localhost") {
+  //   const subdomain = parts[0];
+  //   return subdomain === "localhost" ? null : subdomain;
+  // }
 
   // For 1min.shop domain (e.g., shop1.1min.shop)
   if (
@@ -93,10 +93,10 @@ function getSubdomain(hostname: string): string | null {
     return subdomain === "www" ? null : subdomain;
   }
 
-  // For production domains (e.g., shop1.example.com)
-  if (parts.length >= 3) {
-    return parts[0];
-  }
+  // // For production domains (e.g., shop1.example.com)
+  // if (parts.length >= 3) {
+  //   return parts[0];
+  // }
 
   return null;
 }
