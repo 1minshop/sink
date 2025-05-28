@@ -136,20 +136,15 @@ function ProductCard({ product }: { product: Product }) {
             </p>
           )}
 
-          {/* Price and Rating */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-baseline">
-              <span className="text-lg font-bold text-gray-900">
-                ${product.price}
-              </span>
-              <span className="text-sm text-gray-500 ml-1">
-                {product.currency}
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <span className="text-sm text-gray-600">4.5</span>
-            </div>
+          {/* Price */}
+          <div className="flex items-baseline mb-3">
+            <span className="text-lg font-bold text-gray-900">
+              {product.currency === "BTN" ? "Nu. " : "$ "}
+              {product.price}
+            </span>
+            <span className="text-sm text-gray-500 ml-1">
+              {product.currency}
+            </span>
           </div>
 
           {/* Stock Info */}

@@ -5,7 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { Loader2, PlusCircle, Edit, Trash2, Package, MoreHorizontal } from "lucide-react";
+import {
+  Loader2,
+  PlusCircle,
+  Edit,
+  Trash2,
+  Package,
+  MoreHorizontal,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -142,7 +149,8 @@ function ProductTable({
                     </div>
                   </td>
                   <td className="py-3 px-4 text-gray-900">
-                    ${product.price} {product.currency}
+                    {product.currency === "BTN" ? "Nu. " : "$ "}
+                    {product.price} {product.currency}
                   </td>
                   <td className="py-3 px-4 text-gray-500">
                     {product.sku || "-"}
@@ -224,16 +232,22 @@ function ProductTable({
                       {/* Actions Dropdown */}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                          >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => onEditProduct(product)}>
+                          <DropdownMenuItem
+                            onClick={() => onEditProduct(product)}
+                          >
                             <Edit className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => onDeleteProduct(product.id)}
                             className="text-red-600 focus:text-red-600"
                           >
@@ -249,7 +263,8 @@ function ProductTable({
                       <div>
                         <span className="text-gray-500">Price:</span>
                         <span className="ml-1 font-medium text-gray-900">
-                          ${product.price} {product.currency}
+                          {product.currency === "BTN" ? "Nu." : "$"}
+                          {product.price} {product.currency}
                         </span>
                       </div>
                       <div>
@@ -317,7 +332,6 @@ function CreateProductForm({ onCancel }: { onCancel: () => void }) {
         <form action={createAction} className="space-y-6">
           {/* Image Upload Section */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Product Image</Label>
             <ImageUpload
               onImageChange={setImageUrl}
               disabled={isCreatePending}
@@ -382,13 +396,15 @@ function CreateProductForm({ onCancel }: { onCancel: () => void }) {
               <Label htmlFor="currency" className="text-sm font-medium">
                 Currency
               </Label>
-              <Input
+              <select
                 id="currency"
                 name="currency"
-                defaultValue="USD"
-                placeholder="USD"
-                className="h-10"
-              />
+                defaultValue="BTN"
+                className="w-full h-10 px-3 py-2 text-sm border border-input bg-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+              >
+                <option value="BTN">BTN (Bhutanese Ngultrum)</option>
+                <option value="USD">USD (US Dollar)</option>
+              </select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="inventory" className="text-sm font-medium">
@@ -484,7 +500,6 @@ function EditProductForm({
         <form action={editAction} className="space-y-6">
           {/* Image Upload Section */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Product Image</Label>
             <ImageUpload
               currentImageUrl={product.imageUrl || undefined}
               onImageChange={setImageUrl}
@@ -554,13 +569,15 @@ function EditProductForm({
               <Label htmlFor="currency" className="text-sm font-medium">
                 Currency
               </Label>
-              <Input
+              <select
                 id="currency"
                 name="currency"
-                placeholder="USD"
                 defaultValue={product.currency}
-                className="h-10"
-              />
+                className="w-full h-10 px-3 py-2 text-sm border border-input bg-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+              >
+                <option value="BTN">BTN (Bhutanese Ngultrum)</option>
+                <option value="USD">USD (US Dollar)</option>
+              </select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="inventory" className="text-sm font-medium">

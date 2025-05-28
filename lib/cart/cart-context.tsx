@@ -156,13 +156,15 @@ export function useCartActions() {
     dispatch({ type: "ADD_ITEM", payload: product });
     toast.success(`${product.name} added to cart!`, {
       description: `Price: $${product.price} ${product.currency}`,
-      duration: 3000,
+      duration: 1000,
     });
   };
 
   const removeItem = (itemId: number) => {
     dispatch({ type: "REMOVE_ITEM", payload: itemId });
-    toast.info("Item removed from cart");
+    toast.info("Item removed from cart", {
+      duration: 1000,
+    });
   };
 
   const updateQuantity = (itemId: number, quantity: number) => {
@@ -171,7 +173,9 @@ export function useCartActions() {
 
   const clearCart = () => {
     dispatch({ type: "CLEAR_CART" });
-    toast.success("Cart cleared");
+    toast.success("Cart cleared", {
+      duration: 1000,
+    });
   };
 
   return { addItem, removeItem, updateQuantity, clearCart };

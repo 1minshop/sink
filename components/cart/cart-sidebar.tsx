@@ -110,7 +110,8 @@ export function CartSidebar({ children }: CartSidebarProps) {
                         {item.product.name}
                       </h4>
                       <p className="text-sm text-gray-500">
-                        ${item.product.price} {item.product.currency}
+                        {item.product.currency === "BTN" ? "Nu. " : "$ "}
+                        {item.product.price} {item.product.currency}
                       </p>
                     </div>
 
@@ -154,7 +155,7 @@ export function CartSidebar({ children }: CartSidebarProps) {
                       <X className="h-4 w-4" />
                     </Button>
                     <span className="text-base font-bold text-gray-900">
-                      $
+                      {item.product.currency === "BTN" ? "Nu. " : "$ "}
                       {(parseFloat(item.product.price) * item.quantity).toFixed(
                         2
                       )}
@@ -172,7 +173,10 @@ export function CartSidebar({ children }: CartSidebarProps) {
             <div className="space-y-4">
               <div className="flex justify-between text-base">
                 <span className="text-gray-600">Subtotal</span>
-                <span className="font-semibold">${state.total.toFixed(2)}</span>
+                <span className="font-semibold">
+                  {state.items[0]?.product.currency === "BTN" ? "Nu. " : "$ "}
+                  {state.total.toFixed(2)}
+                </span>
               </div>
               <div className="flex justify-between text-base">
                 <span className="text-gray-600">Shipping</span>
@@ -182,7 +186,9 @@ export function CartSidebar({ children }: CartSidebarProps) {
                 <div className="flex justify-between text-xl font-bold">
                   <span>Total</span>
                   <span className="text-orange-600">
-                    ${state.total.toFixed(2)} USD
+                    {state.items[0]?.product.currency === "BTN" ? "Nu. " : "$ "}
+                    {state.total.toFixed(2)}{" "}
+                    {state.items[0]?.product.currency || "USD"}
                   </span>
                 </div>
               </div>
