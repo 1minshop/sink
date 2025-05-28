@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -154,11 +153,9 @@ function OrderCard({ order }: { order: Order }) {
                   <div className="flex items-center space-x-3">
                     <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden">
                       {item.product.imageUrl ? (
-                        <Image
+                        <img
                           src={item.product.imageUrl}
                           alt={item.product.name}
-                          width={48}
-                          height={48}
                           className="w-full h-full object-cover"
                         />
                       ) : (
