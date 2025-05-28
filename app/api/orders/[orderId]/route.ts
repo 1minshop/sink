@@ -5,10 +5,11 @@ import { eq } from "drizzle-orm";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { orderId: string } }
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
   try {
-    const orderId = parseInt(params.orderId);
+    const { orderId: orderIdParam } = await params;
+    const orderId = parseInt(orderIdParam);
 
     if (isNaN(orderId)) {
       return NextResponse.json({ error: "Invalid order ID" }, { status: 400 });
@@ -54,7 +55,7 @@ export async function GET(
       status: order.status,
       createdAt: order.createdAt.toISOString(),
       teamName,
-      items: orderItemsWithProducts.map((item) => ({
+      items: orderItemsWithProducts.map((item: any) => ({
         name: item.productName,
         quantity: item.orderItem.quantity,
         price: item.orderItem.price,
